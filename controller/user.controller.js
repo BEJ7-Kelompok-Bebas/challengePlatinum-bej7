@@ -50,7 +50,7 @@ class UserController {
         email,
         username,
         password: hashPassword,
-        role: role || 'user',
+        role: role,
         address,
         phone,
       });
