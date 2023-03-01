@@ -1,15 +1,17 @@
-const { User } = require('../database/models');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const ErrorResponse = require('../helpers/error.helper');
-const ResponseFormat = require('../helpers/response.helper');
+const { User } = require("../database/models");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const ErrorResponse = require("../helpers/error.helper");
+const ResponseFormat = require("../helpers/response.helper");
 const {
   registerSchema,
-} = require('../validation/schemas/register.schema');
-const validate = require('../middleware/validation');
+} = require("../validation/schemas/register.schema");
+const validate = require("../middleware/validation");
 const {
   loginSchema,
-} = require('../validation/schemas/login.schema');
+} = require("../validation/schemas/login.schema");
+const Hash = require("../modules/hash");
+const ModuleJwt = require("../modules/jwt");
 
 class UserController {
   async register(req, res, next) {
@@ -31,43 +33,40 @@ class UserController {
         where: {
           email,
         },
-        attributes: ['id'],
+        attributes: ["id"],
       });
 
       if (isEmailExist) {
-        throw new ErrorResponse(400, 'Email already exist');
+        throw new ErrorResponse(400, "Email already exist");
       }
 
       //Hash password
-      const salt = await bcrypt.genSalt(10);
-      const hashPassword = await bcrypt.hash(
-        password,
-        salt,
-      );
+      const hashedPassword = await Hash.hashing(password);
 
       //Create User
-      const user = await User.create({
-        email,
+      await User.create({
         username,
-        password: hashPassword,
-        role: role,
+        email,
+        password: hashedPassword,
+        role: role || "user",
         address,
         phone,
       });
 
       //generate token
-      const jwtPayload = {
-        user_id: user.id,
-      };
-
-      const token = jwt.sign(
-        jwtPayload,
-        process.env.JWT_SECRET,
-        { expiresIn: '30d' },
-      );
+      // const token = jwt.sign(
+      //   {
+      //     user: {
+      //       id: user.id,
+      //       role: user.role,
+      //     },
+      //   },
+      //   process.env.JWT_SECRET,
+      //   { expiresIn: '30d' },
+      // );
 
       return new ResponseFormat(res, 201, {
-        token,
+        message: "User created",
       });
     } catch (error) {
       next(error);
@@ -89,33 +88,146 @@ class UserController {
       });
 
       if (!user) {
-        throw new ErrorResponse(401, 'Invalid Credential');
+        throw new ErrorResponse(401, "Invalid Credential");
       }
 
       //Compare Password
-      const compare = await bcrypt.compare(
+      const isMatched = await Hash.compare(
         password,
         user.password,
       );
-      if (!compare) {
-        throw new ErrorResponse(401, 'Invalid Credential');
+      if (!isMatched) {
+        throw new ErrorResponse(401, "Invalid Credential");
       }
 
       //token
-      const jwtPayload = {
-        user_id: user.id,
-      };
-
-      const token = jwt.sign(
-        jwtPayload,
-        process.env.JWT_SECRET,
-        { expiresIn: '30d' },
+      const accessToken = ModuleJwt.signToken(user.id);
+      const refreshToken = ModuleJwt.signRefreshToken(
+        user.id,
       );
 
+      user.refresh_token = refreshToken;
+      await user.save();
+      res.cookie("jwt", refreshToken, {
+        httpOnly: true,
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+      });
+
       //login
-      return new ResponseFormat(res, 200, { token });
+      return new ResponseFormat(res, 200, { accessToken });
     } catch (error) {
       next(error);
+    }
+  }
+
+  async refreshToken(req, res, next) {
+    try {
+      const refreshToken = req.cookies?.jwt;
+      console.log(refreshToken);
+
+      if (!refreshToken) {
+        throw new ErrorResponse(401, "Unauthorized");
+      }
+
+      // find the user
+      const user = await User.findOne({
+        where: {
+          refresh_token: refreshToken,
+        },
+      });
+
+      // detected reuse or hack
+      if (!user) {
+        throw new ErrorResponse(403, "Forbidden");
+      }
+
+      const decodedRefreshToken =
+        ModuleJwt.verifyRefreshToken(refreshToken);
+
+      // detected reuse or hack
+      if (decodedRefreshToken.id !== user.id) {
+        throw new ErrorResponse(403, "Forbidden");
+      }
+
+      // issue new acces token
+      const newAccessToken = ModuleJwt.signToken(
+        decodedRefreshToken.id,
+      );
+
+      return new ResponseFormat(res, 200, {
+        accessToken: newAccessToken,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async currentUser(req, res, next) {
+    try {
+      const userId = res.locals.userId;
+      const user = await User.findOne({
+        where: {
+          id: userId,
+        },
+      });
+
+      // user not found
+      if (!user) {
+        throw new ErrorResponse(404, "Not found");
+      }
+
+      const userData = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        address: user.address,
+      };
+
+      return new ResponseFormat(res, 200, {
+        user: userData,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async logout(req, res, next) {
+    try {
+      const refreshToken = req?.cookies?.jwt;
+
+      if (!refreshToken) {
+        return res
+          .status(200)
+          .json({ message: "User logged out" });
+      }
+
+      const user = await User.findOne({
+        where: {
+          refresh_token: refreshToken,
+        },
+      });
+
+      // detected hack
+      if (!user) {
+        res.clearCookie("jwt");
+        return new ResponseFormat(res, 200, {
+          message: "User logged out",
+        });
+      }
+
+      // delete token in jwt
+      res.clearCookie("jwt");
+
+      // delete refresh token in db
+      user.refresh_token = null;
+      user.save();
+
+      return new ResponseFormat(res, 200, {
+        message: "User logged out",
+      });
+    } catch (err) {
+      next(err);
     }
   }
 }

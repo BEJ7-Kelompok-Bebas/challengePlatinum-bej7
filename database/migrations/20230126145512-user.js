@@ -31,7 +31,11 @@ module.exports = {
       },
       phone: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
+      },
+      refresh_token: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       created_at: {
         type: Sequelize.DATE,

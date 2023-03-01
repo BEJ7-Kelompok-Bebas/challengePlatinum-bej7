@@ -26,13 +26,17 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    refresh_token: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     address: {
       type: DataTypes.STRING,
       allowNull: true,
     },
     phone: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {
