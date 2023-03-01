@@ -1,6 +1,4 @@
 const { User } = require("../database/models");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const ErrorResponse = require("../helpers/error.helper");
 const ResponseFormat = require("../helpers/response.helper");
 const {
@@ -52,18 +50,6 @@ class UserController {
         address,
         phone,
       });
-
-      //generate token
-      // const token = jwt.sign(
-      //   {
-      //     user: {
-      //       id: user.id,
-      //       role: user.role,
-      //     },
-      //   },
-      //   process.env.JWT_SECRET,
-      //   { expiresIn: '30d' },
-      // );
 
       return new ResponseFormat(res, 201, {
         message: "User created",

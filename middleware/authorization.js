@@ -26,7 +26,7 @@ const authenticated = (req, res, next) => {
   }
 };
 
-const adminRole = async (req, res, next) => {
+const adminRole = async (res, next) => {
   try {
     const userId = res.locals.userId;
 
