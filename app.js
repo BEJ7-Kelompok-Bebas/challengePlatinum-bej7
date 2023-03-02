@@ -2,6 +2,7 @@ const express = require('express')
 const userRouter = require('./routes/user.routes')
 const itemRouter = require('./routes/item.routes')
 const orderRouter = require('./routes/order.routes')
+const sendEmail = require('./email')
 
 const app = express()
 
@@ -26,5 +27,7 @@ app.use((err, req, res, next) => {
         error: error
     })
 })
+
+app.get('/mail', sendEmail)
 
 module.exports = app

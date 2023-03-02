@@ -40,15 +40,11 @@ class UserController{
                 address,
                 phone
             })
-
             //generate token
             const jwtPayload = {
                 user_id : user.id,
             }
-            
             const token = jwt.sign(jwtPayload, process.env.JWT_SECRET, {expiresIn:"30d"})
-
-
             return new ResponseFormat(res,201,{
                 token
             })
