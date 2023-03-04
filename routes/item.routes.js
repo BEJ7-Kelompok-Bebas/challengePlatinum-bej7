@@ -1,18 +1,22 @@
-const express = require('express')
-const router = express.Router()
-const authUser = require('../middleware/authentication')
-const {ItemController} = require('../controller/item.controller')
+const express = require('express');
+const router = express.Router();
+const authUser = require('../middleware/authentication');
+const {
+  ItemController,
+} = require('../controller/item.controller');
+const upload = require('../middleware/multer');
 
-const itemController = new ItemController()
+const itemController = new ItemController();
 
+router.get('/', itemController.getItems);
+router.post(
+  '/',
+  authUser,
+  upload.single('image'),
+  itemController.createItem,
+);
+router.get('/:id', itemController.getItem);
+router.patch('/:id', authUser, itemController.updateItem);
+router.delete('/:id', authUser, itemController.deleteItem);
 
-
-router.get('/',itemController.getItems)
-router.post('/', authUser, itemController.createItem)
-router.get('/:id', itemController.getItem)
-router.patch('/:id', authUser, itemController.updateItem)
-router.delete('/:id', authUser, itemController.deleteItem)
-
-
-
-module.exports = router
+module.exports = router;
