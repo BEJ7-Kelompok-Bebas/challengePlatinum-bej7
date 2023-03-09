@@ -40,6 +40,20 @@ class UserController {
         throw new ErrorResponse(400, "Email already exist");
       }
 
+      const isUsernameExist = await User.findOne({
+        where: {
+          username,
+        },
+        attributes: ["id"],
+      });
+
+      if (isUsernameExist) {
+        throw new ErrorResponse(
+          400,
+          "Username already exist",
+        );
+      }
+
       //Hash password
       const hashedPassword = await Hash.hashing(password);
 
