@@ -7,19 +7,28 @@ const orderController = new OrderController();
 const {
   authenticated,
   adminRole,
+  sellerRole,
+  buyerRole,
 } = require("../middleware/authorization");
 
-router.get("/", authenticated, orderController.getOrders);
+router.get(
+  "/",
+  authenticated,
+  buyerRole,
+  orderController.getOrders,
+);
 
 router.patch(
   "/:id/update",
   authenticated,
+  adminRole,
   orderController.updateOrder,
 );
 
 router.post(
   "/",
   authenticated,
+  buyerRole,
   orderController.createOrder,
 );
 

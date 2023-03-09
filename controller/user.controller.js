@@ -1,6 +1,4 @@
 const { User } = require("../database/models");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const ErrorResponse = require("../helpers/error.helper");
 const ResponseFormat = require("../helpers/response.helper");
 const {
@@ -62,22 +60,10 @@ class UserController {
         username,
         email,
         password: hashedPassword,
-        role: role || "user",
+        role,
         address,
         phone,
       });
-
-      //generate token
-      // const token = jwt.sign(
-      //   {
-      //     user: {
-      //       id: user.id,
-      //       role: user.role,
-      //     },
-      //   },
-      //   process.env.JWT_SECRET,
-      //   { expiresIn: '30d' },
-      // );
 
       return new ResponseFormat(res, 201, {
         message: "User created",
@@ -89,7 +75,7 @@ class UserController {
 
   async login(req, res, next) {
     try {
-      const { email, password, role } = req.body;
+      const { email, password } = req.body;
 
       //Validate req.body
       await validate(loginSchema, req.body);
