@@ -2,6 +2,12 @@ const ErrorResponse = require("../helpers/error.helper");
 const ModuleJwt = require("../modules/jwt");
 const { User } = require("../database/models");
 
+const UserRole = {
+  ADMIN: "admin",
+  SELLER: "seller",
+  BUYER: "buyer",
+};
+
 const authenticated = (req, res, next) => {
   try {
     const accessToken =
@@ -34,7 +40,43 @@ const adminRole = async (res, next) => {
       where: { id: userId },
     });
 
-    if (user.role !== "admin") {
+    if (user.role !== UserRole.ADMIN) {
+      throw new ErrorResponse(403, "Forbidden");
+    }
+
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
+const sellerRole = async (res, next) => {
+  try {
+    const userId = res.locals.userId;
+
+    const user = await User.findOne({
+      where: { id: userId },
+    });
+
+    if (user.role !== UserRole.SELLER) {
+      throw new ErrorResponse(403, "Forbidden");
+    }
+
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
+const buyerRole = async (res, next) => {
+  try {
+    const userId = res.locals.userId;
+
+    const user = await User.findOne({
+      where: { id: userId },
+    });
+
+    if (user.role !== UserRole.BUYER) {
       throw new ErrorResponse(403, "Forbidden");
     }
 
@@ -46,5 +88,8 @@ const adminRole = async (res, next) => {
 
 module.exports = {
   authenticated,
+  UserRole,
   adminRole,
+  sellerRole,
+  buyerRole,
 };

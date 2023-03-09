@@ -46,7 +46,7 @@ class UserController {
         username,
         email,
         password: hashedPassword,
-        role: role || "user",
+        role,
         address,
         phone,
       });
@@ -61,7 +61,7 @@ class UserController {
 
   async login(req, res, next) {
     try {
-      const { email, password, role } = req.body;
+      const { email, password } = req.body;
 
       //Validate req.body
       await validate(loginSchema, req.body);
