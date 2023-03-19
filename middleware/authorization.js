@@ -68,7 +68,7 @@ const sellerRole = async (res, next) => {
   }
 };
 
-const buyerRole = async (res, next) => {
+const buyerRole = async (req, res, next) => {
   try {
     const userId = res.locals.userId;
 
@@ -86,10 +86,30 @@ const buyerRole = async (res, next) => {
   }
 };
 
+const ioAuthenticator = (socket) => {
+  const accessToken =
+    socket.handshake.headers.authorization?.split(" ")[1];
+
+  if (!accessToken) {
+    return new ErrorResponse(401, "Unauthorized");
+  }
+
+  const decodedAccessToken =
+    ModuleJwt.verifyToken(accessToken);
+
+  if (!decodedAccessToken) {
+    console.log("test3");
+    return new ErrorResponse(401, "Unauthorized");
+  }
+
+  return decodedAccessToken;
+};
+
 module.exports = {
   authenticated,
   UserRole,
   adminRole,
   sellerRole,
   buyerRole,
+  ioAuthenticator,
 };
