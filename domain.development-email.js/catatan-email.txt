@@ -1,1 +1,14 @@
-cara kerja feature email
+File controller untuk fungsi email ada di folder domain.development-email
+terdapat controller route dan utils sendiri untuk fungsi email
+terdapat penambahan middleware - emailVerification.js
+terdapat perubahan database : 
+
+register_status: {
+      type: DataTypes.ENUM("Validated", "Pending", "Cancelled"),
+      allowNull: false,
+      defaultValue: "Pending",
+    },
+    verification_token: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
