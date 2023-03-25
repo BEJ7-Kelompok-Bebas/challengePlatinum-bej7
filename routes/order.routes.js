@@ -7,14 +7,13 @@ const orderController = new OrderController();
 const {
   authenticated,
   adminRole,
-  sellerRole,
-  buyerRole,
+  userRole,
 } = require("../middleware/authorization");
 
 router.get(
   "/",
   authenticated,
-  buyerRole,
+  userRole,
   orderController.getOrders,
 );
 
@@ -28,7 +27,7 @@ router.patch(
 router.post(
   "/",
   authenticated,
-  buyerRole,
+  userRole,
   orderController.createOrder,
 );
 

@@ -3,7 +3,6 @@ const router = express.Router();
 const {
   authenticated,
   adminRole,
-  sellerRole,
 } = require("../middleware/authorization");
 const {
   ItemController,
@@ -14,20 +13,20 @@ router.get("/", itemController.getItems);
 router.post(
   "/",
   authenticated,
-  adminRole || sellerRole,
+  adminRole,
   itemController.createItem,
 );
 router.get("/:id", itemController.getItem);
 router.patch(
   "/:id",
   authenticated,
-  adminRole || sellerRole,
+  adminRole,
   itemController.updateItem,
 );
 router.delete(
   "/:id",
   authenticated,
-  adminRole || sellerRole,
+  adminRole,
   itemController.deleteItem,
 );
 
