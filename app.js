@@ -1,4 +1,7 @@
 const express = require("express");
+
+const socketio = require("socket.io");
+const http = require("http");
 const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/user.routes");
 const itemRouter = require("./routes/item.routes");
@@ -26,5 +29,10 @@ app.use((err, req, res, next) => {
     error: error,
   });
 });
+const server = http.createServer(app);
+const io = socketio(server);
+const { Chat } = require("./controller/chat.controller");
 
-module.exports = app;
+Chat(io);
+
+module.exports = server;

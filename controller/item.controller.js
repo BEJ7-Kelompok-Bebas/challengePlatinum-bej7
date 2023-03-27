@@ -85,9 +85,9 @@ class ItemController {
   async createItem(req, res, next) {
     try {
       const {
-        // user: { user_id },
         body: { name, price, stock },
       } = req;
+      const user_id = res.locals.userId;
 
       await validate(createItemSchema, req.body);
 

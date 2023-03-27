@@ -3,15 +3,17 @@ const Item = require("./items.model");
 const Order = require("./orders.model");
 const OrderItem = require("./order-item.model");
 const sequelize = require("./sequelize");
+const Message = require("./message");
+const Room = require("./rooms");
 
 //Relasi User - Item
 User.hasMany(Item, {
   foreignKey: "user_id",
 });
 
-// Item.belongsTo(User, {
-//   foreignKey: 'user_id'
-// })
+Item.belongsTo(User, {
+  foreignKey: "user_id",
+});
 
 // Relasi User - Order
 User.hasMany(Order, {
@@ -43,10 +45,36 @@ OrderItem.belongsTo(Order, {
 Order.belongsToMany(Item, { through: OrderItem });
 Item.belongsToMany(Order, { through: OrderItem });
 
+// User - Room
+User.hasMany(Room, {
+  foreignKey: "user_id",
+});
+Room.belongsTo(User, {
+  foreignKey: "user_id",
+});
+
+// User - Message
+User.hasMany(Message, {
+  foreignKey: "user_id",
+});
+Message.belongsTo(User, {
+  foreignKey: "user_id",
+});
+
+// Room - Message
+Room.hasMany(Message, {
+  foreignKey: "room_id",
+});
+Message.belongsTo(Room, {
+  foreignKey: "room_id",
+});
+
 module.exports = {
   User,
   Item,
   Order,
   OrderItem,
+  Room,
+  Message,
   sequelize,
 };
