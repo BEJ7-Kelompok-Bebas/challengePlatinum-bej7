@@ -57,29 +57,7 @@ const userRole = async (req, res, next) => {
       where: { id: userId },
     });
 
-<<<<<<< HEAD
     if (user.role !== UserRole.USER) {
-=======
-    if (user.role !== UserRole.SELLER) {
-      throw new ErrorResponse(403, "Forbidden");
-    }
-
-    next();
-  } catch (err) {
-    next(err);
-  }
-};
-
-const buyerRole = async (req, res, next) => {
-  try {
-    const userId = res.locals.userId;
-
-    const user = await User.findOne({
-      where: { id: userId },
-    });
-
-    if (user.role !== UserRole.BUYER) {
->>>>>>> socket
       throw new ErrorResponse(403, "Forbidden");
     }
 
@@ -112,11 +90,6 @@ module.exports = {
   authenticated,
   UserRole,
   adminRole,
-<<<<<<< HEAD
   userRole,
-=======
-  sellerRole,
-  buyerRole,
   ioAuthenticator,
->>>>>>> socket
 };
