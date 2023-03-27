@@ -1,22 +1,18 @@
-const {
-  User,
-  Room,
-  Message,
-} = require("../database/models");
-const ErrorResponse = require("../helpers/error.helper");
-const {
-  ioAuthenticator,
-} = require("../middleware/authorization");
-const jwt = require("jsonwebtoken");
+class ChatController {
+  constructor(userModel, roomModel, messageModel, ioAuth) {
+    this.userModel = userModel;
+    this.roomModel = roomModel;
+    this.messageModel = messageModel;
+    this.ioAuth = ioAuth;
+  }
 
-const Chat = (io) => {
-  io.of("/chat").on("connection", async (socket) => {
+  async startChat(socket) {
     console.log("User connected");
-    const { id: user_id } = ioAuthenticator(socket);
+    const { id: user_id } = this.ioAuth(socket);
 
     const r_username = socket.handshake.query.r_username;
 
-    const sender = await User.findOne({
+    const sender = await this.userModel.findOne({
       where: {
         id: user_id,
       },
@@ -31,7 +27,7 @@ const Chat = (io) => {
       roomName = `${sender.username}${r_username}`;
     }
 
-    const receiver = await User.findOne({
+    const receiver = await this.userModel.findOne({
       where: {
         username: r_username,
       },
@@ -41,18 +37,18 @@ const Chat = (io) => {
       return new ErrorResponse(404, "User Not Found");
     }
     let attr = {};
-    if (sender.role == "customer") {
+    if (sender.role === "customer") {
       attr = { name: roomName, user_id: user_id };
     } else {
       attr = { name: roomName };
     }
 
-    let room = await Room.findOne({
+    let room = await this.roomModel.findOne({
       where: attr,
     });
 
     if (!room) {
-      room = await Room.create(attr);
+      room = await this.roomModel.create(attr);
     }
     const room_id = room.id;
 
@@ -62,34 +58,12 @@ const Chat = (io) => {
       username: sender.username,
       id: user_id,
     };
-    console.log("\n");
 
     socket.join(attr.name);
-    const messages = await Message.findAll({
-      where: {
-        room_id,
-      },
-      order: [["created_at", "ASC"]],
-      include: [
-        {
-          model: User,
-          attributes: ["id", "username"],
-        },
-      ],
-    });
-
-    console.log(`\nmessage\n${messages}\n`);
-    messages.forEach((element) => {
-      socket.emit("chatHistory", {
-        message: element.text,
-        user_id: element.user_id,
-        id: element.id,
-      });
-    });
+    this.chatHistory(socket);
 
     socket.on("send", async (data) => {
-      console.log(data);
-      const addMessage = await Message.create({
+      const addMessage = this.messageModel.create({
         user_id: socket.data.id,
         text: data,
         room_id: socket.data.room_id,
@@ -104,7 +78,33 @@ const Chat = (io) => {
     socket.on("disconnect", () => {
       console.log("User Disconnected");
     });
-  });
-};
+  }
 
-module.exports = { Chat };
+  async chatHistory(socket) {
+    const { room_id, roomName } = socket.data;
+    const messages = await this.messageModel.findAll({
+      where: {
+        room_id,
+      },
+      order: [["created_at", "ASC"]],
+      include: [
+        {
+          model: this.userModel,
+          attributes: ["id", "username"],
+        },
+      ],
+    });
+
+    messages.forEach((element) => {
+      socket.to(roomName).emit("chatHistory", {
+        message: element.text,
+        username: element.User.username,
+      });
+    });
+  }
+
+  startChat = this.startChat.bind(this);
+  chatHistory = this.chatHistory.bind(this);
+}
+
+module.exports = { ChatController };

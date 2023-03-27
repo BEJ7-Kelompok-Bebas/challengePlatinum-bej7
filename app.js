@@ -31,8 +31,8 @@ app.use((err, req, res, next) => {
 });
 const server = http.createServer(app);
 const io = socketio(server);
-const { Chat } = require("./controller/chat.controller");
+const { chatRoute } = require("./routes/chat.routes");
 
-Chat(io);
+chatRoute(io);
 
 module.exports = server;
