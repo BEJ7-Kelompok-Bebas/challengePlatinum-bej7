@@ -4,7 +4,7 @@ const { User } = require("../database/models");
 
 const UserRole = {
   ADMIN: "admin",
-  SELLER: "seller",
+  User: "user",
   BUYER: "buyer",
 };
 
@@ -32,7 +32,7 @@ const authenticated = (req, res, next) => {
   }
 };
 
-const adminRole = async (res, next) => {
+const adminRole = async (req, res, next) => {
   try {
     const userId = res.locals.userId;
 
@@ -50,7 +50,7 @@ const adminRole = async (res, next) => {
   }
 };
 
-const sellerRole = async (res, next) => {
+const userRole = async (req, res, next) => {
   try {
     const userId = res.locals.userId;
 
@@ -58,25 +58,7 @@ const sellerRole = async (res, next) => {
       where: { id: userId },
     });
 
-    if (user.role !== UserRole.SELLER) {
-      throw new ErrorResponse(403, "Forbidden");
-    }
-
-    next();
-  } catch (err) {
-    next(err);
-  }
-};
-
-const buyerRole = async (req, res, next) => {
-  try {
-    const userId = res.locals.userId;
-
-    const user = await User.findOne({
-      where: { id: userId },
-    });
-
-    if (user.role !== UserRole.BUYER) {
+    if (user.role !== UserRole.USER) {
       throw new ErrorResponse(403, "Forbidden");
     }
 
@@ -109,7 +91,6 @@ module.exports = {
   authenticated,
   UserRole,
   adminRole,
-  sellerRole,
-  buyerRole,
+  userRole,
   ioAuthenticator,
 };
