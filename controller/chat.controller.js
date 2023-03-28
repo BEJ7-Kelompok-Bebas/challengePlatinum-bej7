@@ -1,22 +1,18 @@
-const {
-  User,
-  Room,
-  Message,
-} = require("../database/models");
-const ErrorResponse = require("../helpers/error.helper");
-const {
-  ioAuthenticator,
-} = require("../middleware/authorization");
-const jwt = require("jsonwebtoken");
+class ChatController {
+  constructor(userModel, roomModel, messageModel, ioAuth) {
+    this.userModel = userModel;
+    this.roomModel = roomModel;
+    this.messageModel = messageModel;
+    this.ioAuth = ioAuth;
+  }
 
-const Chat = (io) => {
-  io.of("/chat").on("connection", async (socket) => {
+  async startChat(socket) {
     console.log("User connected");
-    const { id: user_id } = ioAuthenticator(socket);
+    const { id: user_id } = this.ioAuth(socket);
 
     const r_username = socket.handshake.query.r_username;
 
-    const sender = await User.findOne({
+    const sender = await this.userModel.findOne({
       where: {
         id: user_id,
       },
@@ -25,13 +21,13 @@ const Chat = (io) => {
 
     let roomName;
 
-    if (sender.role == "admin") {
+    if (sender.role == "seller") {
       roomName = `${r_username}${sender.username}`;
     } else {
       roomName = `${sender.username}${r_username}`;
     }
 
-    const receiver = await User.findOne({
+    const receiver = await this.userModel.findOne({
       where: {
         username: r_username,
       },
@@ -41,18 +37,18 @@ const Chat = (io) => {
       return new ErrorResponse(404, "User Not Found");
     }
     let attr = {};
-    if (sender.role !== "admin") {
+    if (sender.role === "customer") {
       attr = { name: roomName, user_id: user_id };
     } else {
       attr = { name: roomName };
     }
 
-    let room = await Room.findOne({
+    let room = await this.roomModel.findOne({
       where: attr,
     });
 
     if (!room) {
-      room = await Room.create(attr);
+      room = await this.roomModel.create(attr);
     }
     const room_id = room.id;
 
@@ -62,7 +58,6 @@ const Chat = (io) => {
       username: sender.username,
       id: user_id,
     };
-    console.log("\n");
 
     socket.join(attr.name);
     this.chatHistory(socket);
