@@ -1,4 +1,4 @@
-const updateStock = async (orders, args) => {
+const updateStock = async (orders, Item, args) => {
   let stocks = [];
   let item_ids = [];
   const orderItem = orders.OrderItems;

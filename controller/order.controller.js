@@ -38,10 +38,10 @@ class OrderController {
         },
         attributes: ["id", "total", "status"],
         include: {
-          model: OrderItem,
+          model: this.OrderItem,
           attributes: ["id", "item_id", "qty", "price"],
           include: {
-            model: Item,
+            model: this.Item,
             attributes: ["name"],
           },
         },
@@ -125,10 +125,10 @@ class OrderController {
       });
 
       if (getOrder) {
-        this.updateStock(getOrder, false);
+        this.updateStock(getOrder, this.Item, false);
       }
 
-      return new ResponseFormat(res, 200, getOrder);
+      return new this.ResponseFormat(res, 200, getOrder);
     } catch (error) {
       return next(error);
     }
@@ -169,10 +169,10 @@ class OrderController {
       }
 
       if (status === "Cancelled") {
-        this.updateStock(order, true);
+        this.updateStock(order, this.Item, true);
       }
 
-      await this.order.update(
+      await this.Order.update(
         { status },
         {
           where: {
@@ -215,8 +215,9 @@ class OrderController {
 
       // update stock item
       if (order) {
-        this.updateStock(order, true);
+        this.updateStock(order, this.Item, true);
       }
+
       const orderUpdate = await this.Order.update(
         { status: "Cancelled" },
         {
@@ -229,11 +230,10 @@ class OrderController {
 
       await this.OrderItem.destroy({
         where: {
-          user_id,
-          id: order_id,
+          order_id: order_id,
         },
       });
-
+      console.log("test6");
       await this.Order.destroy({
         where: {
           user_id,

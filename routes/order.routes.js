@@ -36,7 +36,7 @@ router.get(
 router.patch(
   "/:id/update",
   authenticated,
-  adminRole,
+  userRole,
   orderController.updateOrder,
 );
 
@@ -50,7 +50,7 @@ router.post(
 router.delete(
   "/:id",
   authenticated,
-  adminRole,
+  userRole,
   orderController.deleteOrder,
 );
 
