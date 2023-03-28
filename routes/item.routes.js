@@ -4,10 +4,25 @@ const {
   authenticated,
   adminRole,
 } = require("../middleware/authorization");
+const { Op } = require("sequelize");
+const { Item, User } = require("../database/models");
+const ErrorResponse = require("../helpers/error.helper");
+const ResponseFormat = require("../helpers/response.helper");
+const validate = require("../middleware/validation");
+const createItemSchema = require("../validation/schemas/createItem.schema");
 const {
   ItemController,
 } = require("../controller/item.controller");
-const itemController = new ItemController();
+
+const itemController = new ItemController(
+  User,
+  Item,
+  ErrorResponse,
+  ResponseFormat,
+  validate,
+  createItemSchema,
+  Op,
+);
 
 router.get("/", itemController.getItems);
 router.post(

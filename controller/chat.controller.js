@@ -25,7 +25,7 @@ const Chat = (io) => {
 
     let roomName;
 
-    if (sender.role == "seller") {
+    if (sender.role == "admin") {
       roomName = `${r_username}${sender.username}`;
     } else {
       roomName = `${sender.username}${r_username}`;
@@ -41,7 +41,7 @@ const Chat = (io) => {
       return new ErrorResponse(404, "User Not Found");
     }
     let attr = {};
-    if (sender.role == "customer") {
+    if (sender.role !== "admin") {
       attr = { name: roomName, user_id: user_id };
     } else {
       attr = { name: roomName };
@@ -65,31 +65,10 @@ const Chat = (io) => {
     console.log("\n");
 
     socket.join(attr.name);
-    const messages = await Message.findAll({
-      where: {
-        room_id,
-      },
-      order: [["created_at", "ASC"]],
-      include: [
-        {
-          model: User,
-          attributes: ["id", "username"],
-        },
-      ],
-    });
-
-    console.log(`\nmessage\n${messages}\n`);
-    messages.forEach((element) => {
-      socket.emit("chatHistory", {
-        message: element.text,
-        user_id: element.user_id,
-        id: element.id,
-      });
-    });
+    this.chatHistory(socket);
 
     socket.on("send", async (data) => {
-      console.log(data);
-      const addMessage = await Message.create({
+      const addMessage = this.messageModel.create({
         user_id: socket.data.id,
         text: data,
         room_id: socket.data.room_id,
@@ -104,7 +83,33 @@ const Chat = (io) => {
     socket.on("disconnect", () => {
       console.log("User Disconnected");
     });
-  });
-};
+  }
 
-module.exports = { Chat };
+  async chatHistory(socket) {
+    const { room_id, roomName } = socket.data;
+    const messages = await this.messageModel.findAll({
+      where: {
+        room_id,
+      },
+      order: [["created_at", "ASC"]],
+      include: [
+        {
+          model: this.userModel,
+          attributes: ["id", "username"],
+        },
+      ],
+    });
+
+    messages.forEach((element) => {
+      socket.to(roomName).emit("chatHistory", {
+        message: element.text,
+        username: element.User.username,
+      });
+    });
+  }
+
+  startChat = this.startChat.bind(this);
+  chatHistory = this.chatHistory.bind(this);
+}
+
+module.exports = { ChatController };

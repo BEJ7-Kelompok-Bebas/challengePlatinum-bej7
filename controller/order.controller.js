@@ -1,13 +1,19 @@
-const {
-  OrderItem,
-  Order,
-  Item,
-} = require("../database/models");
-const ErrorResponse = require("../helpers/error.helper");
-const ResponseFormat = require("../helpers/response.helper");
-
 class OrderController {
-  constructor() {}
+  constructor(
+    Order,
+    OrderItem,
+    Item,
+    ErrorResponse,
+    ResponseFormat,
+    updateStock,
+  ) {
+    this.Order = Order;
+    this.OrderItem = OrderItem;
+    this.Item = Item;
+    this.ErrorResponse = ErrorResponse;
+    this.ResponseFormat = ResponseFormat;
+    this.updateStock = updateStock;
+  }
 
   async getOrders(req, res, next) {
     try {
@@ -26,7 +32,7 @@ class OrderController {
         queryObject.order_id = order_id;
       }
 
-      const order = await Order.findAll({
+      const order = await this.Order.findAll({
         where: {
           ...queryObject,
         },
@@ -42,12 +48,15 @@ class OrderController {
       });
 
       if (!order) {
-        throw new ErrorResponse(400, "There is no orders");
+        throw new this.ErrorResponse(
+          400,
+          "There is no orders",
+        );
       }
 
-      return new ResponseFormat(res, 200, order);
+      return new this.ResponseFormat(res, 200, order);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 
@@ -73,7 +82,7 @@ class OrderController {
 
       let total = 0;
 
-      let order = await Order.create({
+      let order = await this.Order.create({
         user_id: user_id,
         total: total,
       });
@@ -86,11 +95,11 @@ class OrderController {
         total += element.qty * element.price;
       });
 
-      const orderItem = await OrderItem.bulkCreate(
+      const orderItem = await this.OrderItem.bulkCreate(
         orderItems,
       );
 
-      await Order.update(
+      await this.Order.update(
         { total },
         {
           where: {
@@ -100,28 +109,28 @@ class OrderController {
         },
       );
 
-      const getOrder = await Order.findOne({
+      const getOrder = await this.Order.findOne({
         where: {
           user_id,
           id: order_id,
         },
         include: {
-          model: OrderItem,
+          model: this.OrderItem,
           attributes: ["id", "item_id", "qty", "price"],
           include: {
-            model: Item,
+            model: this.Item,
             attributes: ["name", "stock"],
           },
         },
       });
 
       if (getOrder) {
-        updateStock(getOrder, false);
+        this.updateStock(getOrder, false);
       }
 
       return new ResponseFormat(res, 200, getOrder);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 
@@ -134,7 +143,7 @@ class OrderController {
 
       const user_id = res.locals.userId;
 
-      let order = await Order.findOne({
+      let order = await this.Order.findOne({
         where: {
           id: order_id,
           user_id,
@@ -142,10 +151,10 @@ class OrderController {
         },
         include: [
           {
-            model: OrderItem,
+            model: this.OrderItem,
             attributes: ["id", "item_id", "qty", "price"],
             include: {
-              model: Item,
+              model: this.Item,
               attributes: ["name", "stock"],
             },
           },
@@ -153,14 +162,17 @@ class OrderController {
       });
 
       if (!order) {
-        throw new ErrorResponse(404, `Order Not Found`);
+        throw new this.ErrorResponse(
+          404,
+          `Order Not Found`,
+        );
       }
 
       if (status === "Cancelled") {
-        updateStock(order, true);
+        this.updateStock(order, true);
       }
 
-      await order.update(
+      await this.order.update(
         { status },
         {
           where: {
@@ -170,9 +182,9 @@ class OrderController {
         },
       );
 
-      return new ResponseFormat(res, 200, order);
+      return new this.ResponseFormat(res, 200, order);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 
@@ -183,7 +195,7 @@ class OrderController {
       } = req;
       const user_id = res.locals.userId;
 
-      const order = await Order.findOne({
+      const order = await this.Order.findOne({
         where: {
           id: order_id,
           user_id,
@@ -191,10 +203,10 @@ class OrderController {
         },
         include: [
           {
-            model: OrderItem,
+            model: this.OrderItem,
             attributes: ["id", "item_id", "qty", "price"],
             include: {
-              model: Item,
+              model: this.Item,
               attributes: ["name", "stock"],
             },
           },
@@ -203,9 +215,9 @@ class OrderController {
 
       // update stock item
       if (order) {
-        updateStock(order, true);
+        this.updateStock(order, true);
       }
-      const orderUpdate = await Order.update(
+      const orderUpdate = await this.Order.update(
         { status: "Cancelled" },
         {
           where: {
@@ -215,49 +227,34 @@ class OrderController {
         },
       );
 
-      await OrderItem.destroy({
+      await this.OrderItem.destroy({
         where: {
           user_id,
           id: order_id,
         },
       });
 
-      await Order.destroy({
+      await this.Order.destroy({
         where: {
           user_id,
           id: order_id,
         },
       });
 
-      return new ResponseFormat(res, 200, "Order deleted");
+      return new this.ResponseFormat(
+        res,
+        200,
+        "Order deleted",
+      );
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
+
+  getOrders = this.getOrders.bind(this);
+  createOrder = this.createOrder.bind(this);
+  updateOrder = this.updateOrder.bind(this);
+  deleteOrder = this.deleteOrder.bind(this);
 }
 
-const updateStock = async (orders, args) => {
-  let stocks = [];
-  let item_ids = [];
-  const orderItem = orders.OrderItems;
-  orderItem.forEach((data) => {
-    if (args) {
-      stocks.push(data.Item.stock + data.qty);
-    } else {
-      stocks.push(data.Item.stock - data.qty);
-    }
-    item_ids.push(data.item_id);
-  });
-
-  for (let i = 0; i < stocks.length - 1; i++) {
-    await Item.update(
-      { stock: stocks[i] },
-      {
-        where: {
-          id: item_ids[i],
-        },
-      },
-    );
-  }
-};
 module.exports = { OrderController };
