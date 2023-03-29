@@ -37,6 +37,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      register_status: {
+        type: Sequelize.ENUM("Validated", "Pending", "Cancelled"),
+        allowNull: false,
+        defaultValue: "Pending",
+      },
+      verification_token: {
+        type: Sequelize.STRING,
+      },
       created_at: {
         type: Sequelize.DATE,
         defaultValue: Date.now(),

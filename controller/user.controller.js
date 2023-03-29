@@ -10,6 +10,8 @@ const {
 } = require("../validation/schemas/login.schema");
 const Hash = require("../modules/hash");
 const ModuleJwt = require("../modules/jwt");
+const sendEmail = require("../utils/sendEmail");
+const { v4: uuidv4 } = require("uuid");
 
 class UserController {
   async register(req, res, next) {
@@ -51,19 +53,24 @@ class UserController {
           "Username already exist",
         );
       }
-
+      // create random token 
+      let randomToken = uuidv4();
       //Hash password
       const hashedPassword = await Hash.hashing(password);
 
+
       //Create User
-      await User.create({
+      const user = await User.create({
         username,
         email,
         password: hashedPassword,
         role,
         address,
         phone,
+        verification_token: randomToken,
       });
+      // kirim email dengan parameter user register
+      sendEmail(user);
 
       return new ResponseFormat(res, 201, {
         message: "User created",
@@ -73,6 +80,45 @@ class UserController {
     }
   }
 
+  // confirm register
+  async confirmRegister(req, res, next) {
+    const { token } = req.params;
+    try {
+      // Mencari user berdasarkan email, yg telah diberi verif code.
+      const users = await User.findOne({
+        where: {
+          verification_token: token,
+        },
+      });
+      if (!users) {
+        return res.status(404).json({
+          message: "Invalid token",
+        });
+      }
+
+      if (users) {
+        await User.update(
+          { verification_token: null, register_status: "Validated" },
+          {
+            where: {
+              verification_token: token,
+            },
+          }
+        );
+      }
+      // users.is_verified = true;
+      // users.verification_token = null;
+      // await users.save();
+      return res.status(200).json({
+        message: "Email berhasil terverifikasi. Register Berhasil ",
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        message: "Server error",
+      });
+    }
+  }
   async login(req, res, next) {
     try {
       const { email, password } = req.body;

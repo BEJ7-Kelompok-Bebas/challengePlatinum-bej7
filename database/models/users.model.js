@@ -38,6 +38,15 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    register_status: {
+      type: DataTypes.ENUM("Validated", "Pending", "Cancelled"),
+      allowNull: false,
+      defaultValue: "Pending",
+    },
+    verification_token: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     sequelize: sequelize,

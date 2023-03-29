@@ -10,6 +10,7 @@ const {
 const userController = new UserController();
 
 router.post("/register", userController.register);
+router.get("/register/verify/:token", userController.confirmRegister);
 router.post("/login", userController.login);
 router.get("/refresh-token", userController.refreshToken);
 router.get(
