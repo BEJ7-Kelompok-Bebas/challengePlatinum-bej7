@@ -88,7 +88,6 @@ const ioAuthenticator = (socket) => {
 
 module.exports = {
   authenticated,
-  UserRole,
   adminRole,
   userRole,
   ioAuthenticator,
