@@ -7,7 +7,7 @@ const findOneBuyer = (params) => {
   });
 };
 
-const findOneSeller = (params) => {
+const findOneAdmin = (params) => {
   return Promise.resolve({
     user_id: 2,
     email: "test2@gmail.com",
