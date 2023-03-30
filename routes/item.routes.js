@@ -3,16 +3,16 @@ const router = express.Router();
 const {
   authenticated,
   adminRole,
-} = require("../middleware/authorization");
+  validate,
+} = require("../middleware");
 const { Op } = require("sequelize");
 const { Item, User } = require("../database/models");
-const ErrorResponse = require("../helpers/error.helper");
-const ResponseFormat = require("../helpers/response.helper");
-const validate = require("../middleware/validation");
-const createItemSchema = require("../validation/schemas/createItem.schema");
 const {
-  ItemController,
-} = require("../controller/item.controller");
+  ErrorResponse,
+  ResponseFormat,
+} = require("../helpers");
+const createItemSchema = require("../validation/schemas");
+const { ItemController } = require("../controller");
 
 const itemController = new ItemController(
   User,

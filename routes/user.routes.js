@@ -1,13 +1,31 @@
 const express = require("express");
 const router = express.Router();
 const {
-  UserController,
-} = require("../controller/user.controller");
-const {
   authenticated,
-} = require("../middleware/authorization");
+  validate,
+} = require("../middleware");
+const { User } = require("../database/models");
+const {
+  ErrorResponse,
+  ResponseFormat,
+} = require("../helpers/");
+const {
+  registerSchema,
+  loginSchema,
+} = require("../validation/schemas");
+const { Hash, ModuleJwt } = require("../modules");
+const { UserController } = require("../controller");
 
-const userController = new UserController();
+const userController = new UserController(
+  User,
+  Hash,
+  ModuleJwt,
+  validate,
+  registerSchema,
+  loginSchema,
+  ResponseFormat,
+  ErrorResponse,
+);
 
 router.post("/register", userController.register);
 router.post("/login", userController.login);

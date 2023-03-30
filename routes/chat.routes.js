@@ -3,12 +3,8 @@ const {
   Room,
   Message,
 } = require("../database/models");
-const {
-  ioAuthenticator,
-} = require("../middleware/authorization");
-const {
-  ChatController,
-} = require("../controller/chat.controller");
+const { ioAuthenticator } = require("../middleware");
+const { ChatController } = require("../controller");
 
 const chatController = new ChatController(
   User,

@@ -2,20 +2,19 @@ const express = require("express");
 const router = express.Router();
 const {
   authenticated,
-  adminRole,
   userRole,
-} = require("../middleware/authorization");
+} = require("../middleware");
 const {
   OrderItem,
   Order,
   Item,
 } = require("../database/models");
-const ErrorResponse = require("../helpers/error.helper");
-const ResponseFormat = require("../helpers/response.helper");
-const updateStock = require("../modules/updateStock");
 const {
-  OrderController,
-} = require("../controller/order.controller");
+  ErrorResponse,
+  ResponseFormat,
+} = require("../helpers");
+const { updateStock } = require("../modules");
+const { OrderController } = require("../controller");
 
 const orderController = new OrderController(
   Order,
