@@ -3,11 +3,26 @@ const router = express.Router();
 const {
   authenticated,
   adminRole,
-} = require("../middleware/authorization");
+  validate,
+} = require("../middleware");
+const { Op } = require("sequelize");
+const { Item, User } = require("../database/models");
 const {
-  ItemController,
-} = require("../controller/item.controller");
-const itemController = new ItemController();
+  ErrorResponse,
+  ResponseFormat,
+} = require("../helpers");
+const createItemSchema = require("../validation/schemas");
+const { ItemController } = require("../controller");
+
+const itemController = new ItemController(
+  User,
+  Item,
+  ErrorResponse,
+  ResponseFormat,
+  validate,
+  createItemSchema,
+  Op,
+);
 
 router.get("/", itemController.getItems);
 router.post(

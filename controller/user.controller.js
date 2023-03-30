@@ -1,19 +1,27 @@
-const { User } = require("../database/models");
-const ErrorResponse = require("../helpers/error.helper");
-const ResponseFormat = require("../helpers/response.helper");
-const {
-  registerSchema,
-} = require("../validation/schemas/register.schema");
-const validate = require("../middleware/validation");
-const {
-  loginSchema,
-} = require("../validation/schemas/login.schema");
-const Hash = require("../modules/hash");
-const ModuleJwt = require("../modules/jwt");
-const sendEmail = require("../utils/sendEmail");
-const { v4: uuidv4 } = require("uuid");
-
 class UserController {
+  constructor(
+    User,
+    Hash,
+    ModuleJwt,
+    validate,
+    registerSchema,
+    loginSchema,
+    ResponseFormat,
+    ErrorResponse,
+    sendEmail,
+    uuidv4,
+  ) {
+    this.User = User;
+    this.Hash = Hash;
+    this.ModuleJwt = ModuleJwt;
+    this.validate = validate;
+    this.registerSchema = registerSchema;
+    this.loginSchema = loginSchema;
+    this.ResponseFormat = ResponseFormat;
+    this.ErrorResponse = ErrorResponse;
+    this.sendEmail = sendEmail;
+    this.uuidv4 = uuidv4;
+  }
   async register(req, res, next) {
     try {
       const {
@@ -26,10 +34,10 @@ class UserController {
       } = req.body;
 
       // Validate req. body
-      await validate(registerSchema, req.body);
+      await this.validate(this.registerSchema, req.body);
 
       //Check email exist
-      const isEmailExist = await User.findOne({
+      const isEmailExist = await this.User.findOne({
         where: {
           email,
         },
@@ -37,10 +45,13 @@ class UserController {
       });
 
       if (isEmailExist) {
-        throw new ErrorResponse(400, "Email already exist");
+        throw new this.ErrorResponse(
+          400,
+          "Email already exist",
+        );
       }
 
-      const isUsernameExist = await User.findOne({
+      const isUsernameExist = await this.User.findOne({
         where: {
           username,
         },
@@ -48,19 +59,20 @@ class UserController {
       });
 
       if (isUsernameExist) {
-        throw new ErrorResponse(
+        throw new this.ErrorResponse(
           400,
           "Username already exist",
         );
       }
-      // create random token 
-      let randomToken = uuidv4();
+      // create random token
+      let randomToken = this.uuidv4();
       //Hash password
-      const hashedPassword = await Hash.hashing(password);
-
+      const hashedPassword = await this.Hash.hashing(
+        password,
+      );
 
       //Create User
-      const user = await User.create({
+      await this.User.create({
         username,
         email,
         password: hashedPassword,
@@ -70,13 +82,13 @@ class UserController {
         verification_token: randomToken,
       });
       // kirim email dengan parameter user register
-      sendEmail(user);
+      this.sendEmail(user);
 
-      return new ResponseFormat(res, 201, {
+      return new this.ResponseFormat(res, 201, {
         message: "User created",
       });
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 
@@ -85,38 +97,41 @@ class UserController {
     const { token } = req.params;
     try {
       // Mencari user berdasarkan email, yg telah diberi verif code.
-      const users = await User.findOne({
+      const users = await this.User.findOne({
         where: {
           verification_token: token,
         },
       });
+
       if (!users) {
-        return res.status(404).json({
-          message: "Invalid token",
+        throw new this.ErrorResponse(404, {
+          message: "Invalid Token",
         });
       }
 
       if (users) {
-        await User.update(
-          { verification_token: null, register_status: "Validated" },
+        await this.User.update(
+          {
+            verification_token: null,
+            register_status: "Validated",
+          },
           {
             where: {
               verification_token: token,
             },
-          }
+          },
         );
       }
       // users.is_verified = true;
       // users.verification_token = null;
       // await users.save();
-      return res.status(200).json({
-        message: "Email berhasil terverifikasi. Register Berhasil ",
+      return new this.ResponseFormat(res, 200, {
+        message:
+          "Email berhasil terverifikasi. Register Berhasil ",
       });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({
-        message: "Server error",
-      });
+      return next(error);
     }
   }
   async login(req, res, next) {
@@ -124,31 +139,38 @@ class UserController {
       const { email, password } = req.body;
 
       //Validate req.body
-      await validate(loginSchema, req.body);
+      await this.validate(this.loginSchema, req.body);
 
       //Check isEmailExist
-      const user = await User.findOne({
+      const user = await this.User.findOne({
         where: {
           email,
         },
       });
 
       if (!user) {
-        throw new ErrorResponse(401, "Invalid Credential");
+        throw new this.ErrorResponse(
+          401,
+          "Invalid Credential",
+        );
       }
 
       //Compare Password
-      const isMatched = await Hash.compare(
+      const isMatched = await this.Hash.compare(
         password,
         user.password,
       );
+
       if (!isMatched) {
-        throw new ErrorResponse(401, "Invalid Credential");
+        throw new this.ErrorResponse(
+          401,
+          "Invalid Credential",
+        );
       }
 
       //token
-      const accessToken = ModuleJwt.signToken(user.id);
-      const refreshToken = ModuleJwt.signRefreshToken(
+      const accessToken = this.ModuleJwt.signToken(user.id);
+      const refreshToken = this.ModuleJwt.signRefreshToken(
         user.id,
       );
 
@@ -160,9 +182,11 @@ class UserController {
       });
 
       //login
-      return new ResponseFormat(res, 200, { accessToken });
+      return new this.ResponseFormat(res, 200, {
+        accessToken,
+      });
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 
@@ -172,11 +196,11 @@ class UserController {
       console.log(refreshToken);
 
       if (!refreshToken) {
-        throw new ErrorResponse(401, "Unauthorized");
+        throw new this.ErrorResponse(401, "Unauthorized");
       }
 
       // find the user
-      const user = await User.findOne({
+      const user = await this.User.findOne({
         where: {
           refresh_token: refreshToken,
         },
@@ -184,34 +208,34 @@ class UserController {
 
       // detected reuse or hack
       if (!user) {
-        throw new ErrorResponse(403, "Forbidden");
+        throw new this.ErrorResponse(403, "Forbidden");
       }
 
       const decodedRefreshToken =
-        ModuleJwt.verifyRefreshToken(refreshToken);
+        this.ModuleJwt.verifyRefreshToken(refreshToken);
 
       // detected reuse or hack
       if (decodedRefreshToken.id !== user.id) {
-        throw new ErrorResponse(403, "Forbidden");
+        throw new this.ErrorResponse(403, "Forbidden");
       }
 
       // issue new acces token
-      const newAccessToken = ModuleJwt.signToken(
+      const newAccessToken = this.ModuleJwt.signToken(
         decodedRefreshToken.id,
       );
 
-      return new ResponseFormat(res, 200, {
+      return new this.ResponseFormat(res, 200, {
         accessToken: newAccessToken,
       });
     } catch (err) {
-      next(err);
+      return next(err);
     }
   }
 
   async currentUser(req, res, next) {
     try {
       const userId = res.locals.userId;
-      const user = await User.findOne({
+      const user = await this.User.findOne({
         where: {
           id: userId,
         },
@@ -219,7 +243,7 @@ class UserController {
 
       // user not found
       if (!user) {
-        throw new ErrorResponse(404, "Not found");
+        throw new this.ErrorResponse(404, "Not found");
       }
 
       const userData = {
@@ -230,11 +254,11 @@ class UserController {
         address: user.address,
       };
 
-      return new ResponseFormat(res, 200, {
+      return new this.ResponseFormat(res, 200, {
         user: userData,
       });
     } catch (err) {
-      next(err);
+      return next(err);
     }
   }
 
@@ -243,12 +267,12 @@ class UserController {
       const refreshToken = req?.cookies?.jwt;
 
       if (!refreshToken) {
-        return res
-          .status(200)
-          .json({ message: "User logged out" });
+        return new this.ResponseFormat(res, 200, {
+          message: "User logged out",
+        });
       }
 
-      const user = await User.findOne({
+      const user = await this.User.findOne({
         where: {
           refresh_token: refreshToken,
         },
@@ -257,7 +281,7 @@ class UserController {
       // detected hack
       if (!user) {
         res.clearCookie("jwt");
-        return new ResponseFormat(res, 200, {
+        return new this.ResponseFormat(res, 200, {
           message: "User logged out",
         });
       }
@@ -269,13 +293,18 @@ class UserController {
       user.refresh_token = null;
       user.save();
 
-      return new ResponseFormat(res, 200, {
+      return new this.ResponseFormat(res, 200, {
         message: "User logged out",
       });
     } catch (err) {
-      next(err);
+      return next(err);
     }
   }
+  register = this.register.bind(this);
+  login = this.login.bind(this);
+  refreshToken = this.refreshToken.bind(this);
+  currentUser = this.currentUser.bind(this);
+  logout = this.logout.bind(this);
 }
 
 module.exports = { UserController };

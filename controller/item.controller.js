@@ -1,29 +1,39 @@
-const jwt = require("jsonwebtoken");
-const { Op } = require("sequelize");
-const { Item, User } = require("../database/models");
-const ErrorResponse = require("../helpers/error.helper");
-const ResponseFormat = require("../helpers/response.helper");
-const validate = require("../middleware/validation");
-const createItemSchema = require("../validation/schemas/createItem.schema");
-
 class ItemController {
+  constructor(
+    User,
+    Item,
+    ErrorResponse,
+    ResponseFormat,
+    validate,
+    createItemSchema,
+    Op,
+  ) {
+    this.User = User;
+    this.Item = Item;
+    this.ErrorResponse = ErrorResponse;
+    this.ResponseFormat = ResponseFormat;
+    this.validate = validate;
+    this.createItemSchema = createItemSchema;
+    this.Op = Op;
+  }
+
   async getItems(req, res, next) {
     try {
       const { name, sort, numericFilters } = req.query;
       let queryObject = {};
 
       if (name) {
-        queryObject.name = { [Op.like]: `%${name}%` };
+        queryObject.name = { [this.Op.like]: `%${name}%` };
       }
 
       // example ?numericFilters=price>1000,stock<20
       if (numericFilters) {
         const operatorMap = {
-          ">": Op.gt,
-          ">=": Op.gte,
-          "=": Op.eq,
-          "<": Op.lt,
-          "<=": Op.lte,
+          ">": this.Op.gt,
+          ">=": this.Op.gte,
+          "=": this.Op.eq,
+          "<": this.Op.lt,
+          "<=": this.Op.lte,
         };
         const regEx = /\b(<|>|>=|=|<|<=)\b/g;
         numericFilters.split(",").forEach((item) => {
@@ -32,7 +42,9 @@ class ItemController {
             regEx,
             (match) => `_${match}_`,
           );
+          //qty_>_1
           const filterSplit = filter.split("_");
+          // {qty:{Op.gt:1}}
           queryObject[filterSplit[0]] = {
             [operatorMap[filterSplit[1]]]: filterSplit[2],
           };
@@ -58,7 +70,7 @@ class ItemController {
       const limit = Number(req.query.limit) || 10;
       const skip = (page - 1) * limit;
 
-      let items = await Item.findAll({
+      let items = await this.Item.findAll({
         where: {
           ...queryObject,
         },
@@ -67,18 +79,18 @@ class ItemController {
         offset: skip,
         attributes: ["id", "name", "price", "stock"],
         include: {
-          model: User,
+          model: this.User,
           attributes: ["id", "username", "email"],
         },
       });
 
       if (items.length === 0) {
-        throw new ErrorResponse(404, "No Items Found");
+        throw new this.ErrorResponse(404, "No Items Found");
       }
 
-      return new ResponseFormat(res, 200, items);
+      return new this.ResponseFormat(res, 200, items);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 
@@ -89,18 +101,18 @@ class ItemController {
       } = req;
       const user_id = res.locals.userId;
 
-      await validate(createItemSchema, req.body);
+      await this.validate(this.createItemSchema, req.body);
 
-      const item = await Item.create({
-        // user_id,
+      const item = await this.Item.create({
+        user_id,
         name,
         price,
         stock,
       });
 
-      return new ResponseFormat(res, 201, item);
+      return new this.ResponseFormat(res, 201, item);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 
@@ -108,35 +120,35 @@ class ItemController {
     try {
       const { id: item_id } = req.params;
 
-      const item = await Item.findAll({
+      const item = await this.Item.findAll({
         where: {
           id: parseInt(item_id),
         },
         include: [
           {
-            model: User,
+            model: this.User,
             attributes: ["id", "username", "email"],
           },
         ],
       });
 
-      return new ResponseFormat(res, 200, item);
+      return new this.ResponseFormat(res, 200, item);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 
   async updateItem(req, res, next) {
     try {
       const {
-        user: { user_id },
         params: { id: item_id },
         body: { price, stock },
       } = req;
+      const user_id = res.locals.userId;
 
       const updatedAttr = { price: price, stock: stock };
 
-      let item = await Item.findOne({
+      let item = await this.Item.findOne({
         where: {
           id: item_id,
           user_id,
@@ -144,10 +156,10 @@ class ItemController {
       });
 
       if (!item) {
-        throw new ErrorResponse(404, "Item Not Found");
+        throw new this.ErrorResponse(404, "Item Not Found");
       }
 
-      await Item.update(
+      await this.Item.update(
         { ...updatedAttr },
         {
           where: {
@@ -164,20 +176,20 @@ class ItemController {
       //     }
       // })
 
-      return new ResponseFormat(res, 200, item);
+      return new this.ResponseFormat(res, 200, item);
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 
   async deleteItem(req, res, next) {
     try {
       const {
-        user: { user_id },
         params: { id: item_id },
       } = req;
+      const user_id = res.locals.userId;
 
-      const item = await Item.destroy({
+      const item = await this.Item.destroy({
         where: {
           id: item_id,
           user_id,
@@ -185,14 +197,23 @@ class ItemController {
       });
 
       if (!item) {
-        throw new ErrorResponse(404, "Item Not Found");
+        throw new this.ErrorResponse(404, "Item Not Found");
       }
 
-      return new ResponseFormat(res, 200, "Item deleted");
+      return new this.ResponseFormat(
+        res,
+        200,
+        "Item deleted",
+      );
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
+  getItem = this.getItem.bind(this);
+  getItems = this.getItems.bind(this);
+  createItem = this.createItem.bind(this);
+  updateItem = this.updateItem.bind(this);
+  deleteItem = this.deleteItem.bind(this);
 }
 
 module.exports = { ItemController };

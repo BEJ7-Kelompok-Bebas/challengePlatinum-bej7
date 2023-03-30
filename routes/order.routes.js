@@ -1,14 +1,29 @@
 const express = require("express");
 const router = express.Router();
 const {
-  OrderController,
-} = require("../controller/order.controller");
-const orderController = new OrderController();
-const {
   authenticated,
-  adminRole,
   userRole,
-} = require("../middleware/authorization");
+} = require("../middleware");
+const {
+  OrderItem,
+  Order,
+  Item,
+} = require("../database/models");
+const {
+  ErrorResponse,
+  ResponseFormat,
+} = require("../helpers");
+const { updateStock } = require("../modules");
+const { OrderController } = require("../controller");
+
+const orderController = new OrderController(
+  Order,
+  OrderItem,
+  Item,
+  ErrorResponse,
+  ResponseFormat,
+  updateStock,
+);
 
 router.get(
   "/",
@@ -20,7 +35,7 @@ router.get(
 router.patch(
   "/:id/update",
   authenticated,
-  adminRole,
+  userRole,
   orderController.updateOrder,
 );
 
@@ -34,7 +49,7 @@ router.post(
 router.delete(
   "/:id",
   authenticated,
-  adminRole,
+  userRole,
   orderController.deleteOrder,
 );
 
