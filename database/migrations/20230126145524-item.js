@@ -8,9 +8,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        autoIncrement: true,
       },
-      user_id: {
       user_id: {
         type: Sequelize.INTEGER,
         allowNull: true,
@@ -22,7 +20,6 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING,
-        allowNull: false,
         allowNull: false,
       },
       price: {
@@ -39,7 +36,7 @@ module.exports = {
       },
       image_url: {
         type: Sequelize.STRING,
-        allowNull: true,,
+        allowNull: true,
       },
       created_at: {
         type: Sequelize.DATE,
