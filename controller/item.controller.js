@@ -77,7 +77,13 @@ class ItemController {
         order: sortList,
         limit: limit,
         offset: skip,
-        attributes: ["id", "name", "price", "stock"],
+        attributes: [
+          "id",
+          "name",
+          "price",
+          "stock",
+          "image_url",
+        ],
         include: {
           model: this.User,
           attributes: ["id", "username", "email"],
@@ -103,7 +109,7 @@ class ItemController {
 
       await this.validate(this.createItemSchema, req.body);
 
-      const item = await Item.create({
+      const item = await this.Item.create({
         user_id,
         name,
         price,
@@ -148,7 +154,6 @@ class ItemController {
       } = req;
       const user_id = res.locals.userId;
 
-      const updatedAttr = { price: price, stock: stock };
       const updatedAttr = { price: price, stock: stock };
 
       let item = await this.Item.findOne({
