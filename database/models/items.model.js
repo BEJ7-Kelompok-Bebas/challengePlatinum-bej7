@@ -12,7 +12,7 @@ Item.init(
     },
     user_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       field: "user_id",
     },
     name: {
@@ -27,6 +27,14 @@ Item.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    cloudinary_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    image_url: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     sequelize: sequelize,
@@ -38,5 +46,7 @@ Item.init(
     createdAt: "created_at",
   },
 );
+
+module.exports = Item;
 
 module.exports = Item;

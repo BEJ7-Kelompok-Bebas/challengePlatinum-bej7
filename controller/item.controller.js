@@ -103,11 +103,13 @@ class ItemController {
 
       await this.validate(this.createItemSchema, req.body);
 
-      const item = await this.Item.create({
+      const item = await Item.create({
         user_id,
         name,
         price,
         stock,
+        cloudinary_id: req.file.filename,
+        image_url: req.file.path,
       });
 
       return new this.ResponseFormat(res, 201, item);
@@ -146,6 +148,7 @@ class ItemController {
       } = req;
       const user_id = res.locals.userId;
 
+      const updatedAttr = { price: price, stock: stock };
       const updatedAttr = { price: price, stock: stock };
 
       let item = await this.Item.findOne({
