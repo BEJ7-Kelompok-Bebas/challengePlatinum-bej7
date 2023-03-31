@@ -34,7 +34,7 @@ describe("Testing Item Controller", () => {
 
       const mockRes = {};
       mockRes.status = jest.fn().mockReturnValue(mockRes);
-      mockRes.status.json = jest
+      mockRes.json = jest
         .fn()
         .mockImplementation(
           (any) => new ResponseFormat(200, mockItem),
