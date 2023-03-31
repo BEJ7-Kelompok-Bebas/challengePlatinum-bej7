@@ -54,7 +54,9 @@ class OrderController {
         );
       }
 
-      return new this.ResponseFormat(res, 200, order);
+      return res
+        .status(200)
+        .json(new this.ResponseFormat(200, order));
     } catch (error) {
       return next(error);
     }
@@ -128,7 +130,9 @@ class OrderController {
         this.updateStock(getOrder, this.Item, false);
       }
 
-      return new this.ResponseFormat(res, 200, getOrder);
+      return res
+        .status(201)
+        .json(new this.ResponseFormat(201, getOrder));
     } catch (error) {
       return next(error);
     }
@@ -182,7 +186,9 @@ class OrderController {
         },
       );
 
-      return new this.ResponseFormat(res, 200, order);
+      return res
+        .status(200)
+        .json(new this.ResponseFormat(200, order));
     } catch (error) {
       return next(error);
     }
@@ -241,11 +247,11 @@ class OrderController {
         },
       });
 
-      return new this.ResponseFormat(
-        res,
-        200,
-        "Order deleted",
-      );
+      return res
+        .status(200)
+        .json(
+          new this.ResponseFormat(200, "Order deleted"),
+        );
     } catch (error) {
       return next(error);
     }

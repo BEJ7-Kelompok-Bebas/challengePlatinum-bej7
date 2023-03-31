@@ -3,15 +3,12 @@ const router = express.Router();
 const {
   authenticated,
   adminRole,
-  validate,
 } = require("../middleware");
-const { Op } = require("sequelize");
 const { Item, User } = require("../database/models");
 const {
   ErrorResponse,
   ResponseFormat,
 } = require("../helpers");
-const createItemSchema = require("../validation/schemas");
 const { ItemController } = require("../controller");
 
 const itemController = new ItemController(
@@ -19,9 +16,6 @@ const itemController = new ItemController(
   Item,
   ErrorResponse,
   ResponseFormat,
-  validate,
-  createItemSchema,
-  Op,
 );
 
 router.get("/", itemController.getItems);

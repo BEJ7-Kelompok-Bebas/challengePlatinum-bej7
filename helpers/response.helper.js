@@ -1,11 +1,9 @@
-class ResponseFormat{
-    constructor(res, status, data){
-        return res.status(status).json({
-            status: 'Success',
-            data: data,
-            error: {}
-        })
-    }
+class ResponseFormat {
+  constructor(code, data) {
+    this.code = code;
+    this.status = "Success";
+    this.data = data;
+  }
 }
 
-module.exports = ResponseFormat
+module.exports = ResponseFormat;

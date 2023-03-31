@@ -1,20 +1,13 @@
+const { Op } = require("sequelize");
+const createItemSchema = require("../validation/schemas");
+const { validate } = require("../middleware");
+
 class ItemController {
-  constructor(
-    User,
-    Item,
-    ErrorResponse,
-    ResponseFormat,
-    validate,
-    createItemSchema,
-    Op,
-  ) {
+  constructor(User, Item, ErrorResponse, ResponseFormat) {
     this.User = User;
     this.Item = Item;
     this.ErrorResponse = ErrorResponse;
     this.ResponseFormat = ResponseFormat;
-    this.validate = validate;
-    this.createItemSchema = createItemSchema;
-    this.Op = Op;
   }
 
   async getItems(req, res, next) {
@@ -23,17 +16,17 @@ class ItemController {
       let queryObject = {};
 
       if (name) {
-        queryObject.name = { [this.Op.like]: `%${name}%` };
+        queryObject.name = { [Op.like]: `%${name}%` };
       }
 
       // example ?numericFilters=price>1000,stock<20
       if (numericFilters) {
         const operatorMap = {
-          ">": this.Op.gt,
-          ">=": this.Op.gte,
-          "=": this.Op.eq,
-          "<": this.Op.lt,
-          "<=": this.Op.lte,
+          ">": Op.gt,
+          ">=": Op.gte,
+          "=": Op.eq,
+          "<": Op.lt,
+          "<=": Op.lte,
         };
         const regEx = /\b(<|>|>=|=|<|<=)\b/g;
         numericFilters.split(",").forEach((item) => {
@@ -88,7 +81,9 @@ class ItemController {
         throw new this.ErrorResponse(404, "No Items Found");
       }
 
-      return new this.ResponseFormat(res, 200, items);
+      return res
+        .status(200)
+        .json(new this.ResponseFormat(200, items));
     } catch (error) {
       return next(error);
     }
@@ -101,7 +96,7 @@ class ItemController {
       } = req;
       const user_id = res.locals.userId;
 
-      await this.validate(this.createItemSchema, req.body);
+      await validate(createItemSchema, req.body);
 
       const item = await this.Item.create({
         user_id,
@@ -110,7 +105,9 @@ class ItemController {
         stock,
       });
 
-      return new this.ResponseFormat(res, 201, item);
+      return res
+        .status(201)
+        .json(new this.ResponseFormat(201, item));
     } catch (error) {
       return next(error);
     }
@@ -132,7 +129,9 @@ class ItemController {
         ],
       });
 
-      return new this.ResponseFormat(res, 200, item);
+      return res
+        .status(200)
+        .json(new this.ResponseFormat(200, item));
     } catch (error) {
       return next(error);
     }
@@ -176,7 +175,9 @@ class ItemController {
       //     }
       // })
 
-      return new this.ResponseFormat(res, 200, item);
+      return res
+        .status(200)
+        .json(new this.ResponseFormat(200, item));
     } catch (error) {
       return next(error);
     }
@@ -200,11 +201,9 @@ class ItemController {
         throw new this.ErrorResponse(404, "Item Not Found");
       }
 
-      return new this.ResponseFormat(
-        res,
-        200,
-        "Item deleted",
-      );
+      return res
+        .status(200)
+        .json(new this.ResponseFormat(200, "Item deleted"));
     } catch (error) {
       return next(error);
     }
