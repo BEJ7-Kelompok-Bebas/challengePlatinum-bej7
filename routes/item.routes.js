@@ -11,7 +11,6 @@ const {
 const {
   ErrorResponse,
   ResponseFormat,
-,
 } = require("../helpers");
 const createItemSchema = require("../validation/schemas");
 const { ItemController } = require("../controller");;
