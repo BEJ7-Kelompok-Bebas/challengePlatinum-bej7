@@ -1,26 +1,26 @@
+const {
+  registerSchema,
+  loginSchema,
+} = require("../validation/schemas");
+const { v4: uuidv4 } = require("uuid");
+
 class UserController {
   constructor(
     User,
     Hash,
     ModuleJwt,
     validate,
-    registerSchema,
-    loginSchema,
     ResponseFormat,
     ErrorResponse,
     sendEmail,
-    uuidv4,
   ) {
     this.User = User;
     this.Hash = Hash;
     this.ModuleJwt = ModuleJwt;
     this.validate = validate;
-    this.registerSchema = registerSchema;
-    this.loginSchema = loginSchema;
     this.ResponseFormat = ResponseFormat;
     this.ErrorResponse = ErrorResponse;
     this.sendEmail = sendEmail;
-    this.uuidv4 = uuidv4;
   }
   async register(req, res, next) {
     try {
@@ -34,7 +34,7 @@ class UserController {
       } = req.body;
 
       // Validate req. body
-      await this.validate(this.registerSchema, req.body);
+      await this.validate(registerSchema, req.body);
 
       //Check email exist
       const isEmailExist = await this.User.findOne({
@@ -72,7 +72,7 @@ class UserController {
       );
 
       //Create User
-      await this.User.create({
+      const user = await this.User.create({
         username,
         email,
         password: hashedPassword,
@@ -139,7 +139,7 @@ class UserController {
       const { email, password } = req.body;
 
       //Validate req.body
-      await this.validate(this.loginSchema, req.body);
+      await this.validate(loginSchema, req.body);
 
       //Check isEmailExist
       const user = await this.User.findOne({

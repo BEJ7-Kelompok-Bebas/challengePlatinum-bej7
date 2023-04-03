@@ -1,5 +1,7 @@
 const { Op } = require("sequelize");
-const createItemSchema = require("../validation/schemas");
+const {
+  createItemSchema,
+} = require("../validation/schemas");
 
 class ItemController {
   constructor(
@@ -110,7 +112,20 @@ class ItemController {
       console.log("test1\n\n");
       await this.validate(createItemSchema, req.body);
 
-      const item = await this.Item.create({
+      let item = await this.Item.findOne({
+        where: {
+          name,
+        },
+      });
+
+      if (item) {
+        throw new this.ErrorResponse(
+          400,
+          "Item Already Exist",
+        );
+      }
+
+      item = await this.Item.create({
         user_id,
         name,
         price,

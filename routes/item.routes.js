@@ -1,5 +1,5 @@
-const express = require("express");;
-const router = express.Router();;
+const express = require("express");
+const router = express.Router();
 const {
   authenticated,
   adminRole,
@@ -11,8 +11,8 @@ const {
   ResponseFormat,
 } = require("../helpers");
 const createItemSchema = require("../validation/schemas");
-const { ItemController } = require("../controller");;
-const upload = require('../middleware/multer');
+const { ItemController } = require("../controller");
+const upload = require("../middleware/multer");
 
 const itemController = new ItemController(
   User,
@@ -28,7 +28,7 @@ router.post(
   "/",
   authenticated,
   adminRole,
-  upload.single('image'),
+  upload.single("image"),
   itemController.createItem,
 );
 
