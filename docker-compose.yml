@@ -37,7 +37,7 @@ services:
     ports:
       - 5437:5432
     environment:
-      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_PASSWORD=root
       - POSTGRES_DB=challenge
 
 volumes:
