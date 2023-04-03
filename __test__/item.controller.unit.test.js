@@ -10,14 +10,13 @@ const {
 } = require("../factories/user.factory");
 const {
   findOneItem,
-  findAllItem,
-  dataAllItem,
-  dataOneItem,
-  updateItem,
-  sortedItem,
   findAllItemAutoSort,
   findAllItemQuerySort,
+  updateItem,
   destroyItemTrue,
+  dataAllItem,
+  dataOneItem,
+  sortedItem,
 } = require("../factories/item.factory");
 const { validate } = require("../middleware");
 
