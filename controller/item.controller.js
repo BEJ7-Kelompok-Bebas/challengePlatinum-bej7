@@ -197,16 +197,16 @@ class ItemController {
         },
       );
 
-      // item = await Item.findOne({
-      //     where:{
-      //         id: item_id,
-      //         user_id
-      //     }
-      // })
+      // item = await this.Item.findOne({
+      //   where: {
+      //     id: item_id,
+      //     user_id,
+      //   },
+      // });
 
       return res
         .status(200)
-        .json(new this.ResponseFormat(200, item));
+        .json(new this.ResponseFormat(200, "Item Updated"));
     } catch (error) {
       return next(error);
     }
@@ -225,7 +225,7 @@ class ItemController {
           user_id,
         },
       });
-      console.log(item);
+
       if (!item) {
         throw new this.ErrorResponse(404, "Item Not Found");
       }
