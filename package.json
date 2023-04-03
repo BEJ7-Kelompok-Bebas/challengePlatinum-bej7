@@ -7,7 +7,8 @@
     "start": "node index",
     "start:dev": "nodemon index",
     "db:create": "sequelize db:create",
-    "db:migrate": "sequelize db:migrate && sequelize db:seed:all",
+    "db:migrate": "sequelize db:migrate",
+    "db:seed": "sequelize db:seed:all",
     "db:setup": "db:create && db:migrate"
   },
   "keywords": [],

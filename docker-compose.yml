@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  challengeplatinum:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - 3002:3002
+    depends_on:
+      - challengeplatinum_db
+      - challengeplatinum_migration
+    env_file:
+      - .env
+    command: sh -c "npm run start:dev"
+    volumes:
+      - type: volume
+        source: challengeplatinum_volume
+        target: /app/node_modules
+      - type: bind
+        source: .
+        target: /app
+
+  challengeplatinum_migration:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    depends_on:
+      - challengeplatinum_db
+    env_file:
+      - .env
+    command: sh -c "npm run db:migrate && npm run db:seed"
+    restart: on-failure
+
+  challengeplatinum_db:
+    image: postgres:14
+    ports:
+      - 5437:5432
+    environment:
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=challenge
+
+volumes:
+  challengeplatinum_volume:
