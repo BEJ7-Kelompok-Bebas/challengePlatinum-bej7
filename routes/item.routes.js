@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   authenticated,
   adminRole,
+  validate,
 } = require("../middleware");
 const { Item, User } = require("../database/models");
 const {
@@ -16,22 +17,27 @@ const itemController = new ItemController(
   Item,
   ErrorResponse,
   ResponseFormat,
+  validate,
 );
 
 router.get("/", itemController.getItems);
+
 router.post(
   "/",
   authenticated,
   adminRole,
   itemController.createItem,
 );
+
 router.get("/:id", itemController.getItem);
+
 router.patch(
   "/:id",
   authenticated,
   adminRole,
   itemController.updateItem,
 );
+
 router.delete(
   "/:id",
   authenticated,

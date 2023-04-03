@@ -16,12 +16,12 @@ const findOneAdmin = (params) => {
   });
 };
 
-const findOneNull = (params) => {
+const findNull = (params) => {
   return Promise.resolve(null);
 };
 
 module.exports = {
   findOneBuyer,
   findOneAdmin,
-  findOneNull,
+  findNull,
 };

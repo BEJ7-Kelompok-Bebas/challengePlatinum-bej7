@@ -1,13 +1,19 @@
 const { Op } = require("sequelize");
 const createItemSchema = require("../validation/schemas");
-const { validate } = require("../middleware");
 
 class ItemController {
-  constructor(User, Item, ErrorResponse, ResponseFormat) {
+  constructor(
+    User,
+    Item,
+    ErrorResponse,
+    ResponseFormat,
+    validate,
+  ) {
     this.User = User;
     this.Item = Item;
     this.ErrorResponse = ErrorResponse;
     this.ResponseFormat = ResponseFormat;
+    this.validate = validate;
   }
 
   async getItems(req, res, next) {
@@ -95,8 +101,8 @@ class ItemController {
         body: { name, price, stock },
       } = req;
       const user_id = res.locals.userId;
-
-      await validate(createItemSchema, req.body);
+      console.log("test1\n\n");
+      await this.validate(createItemSchema, req.body);
 
       const item = await this.Item.create({
         user_id,
@@ -117,7 +123,7 @@ class ItemController {
     try {
       const { id: item_id } = req.params;
 
-      const item = await this.Item.findAll({
+      const item = await this.Item.findOne({
         where: {
           id: parseInt(item_id),
         },
@@ -196,7 +202,7 @@ class ItemController {
           user_id,
         },
       });
-
+      console.log(item);
       if (!item) {
         throw new this.ErrorResponse(404, "Item Not Found");
       }
