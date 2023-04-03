@@ -3,7 +3,7 @@ const findOneBuyer = (params) => {
     user_id: 1,
     email: "test1@gmail.com",
     username: "test1",
-    role: "buyer",
+    role: "user",
   });
 };
 
@@ -12,16 +12,16 @@ const findOneAdmin = (params) => {
     user_id: 2,
     email: "test2@gmail.com",
     username: "test2",
-    role: "seller",
+    role: "admin",
   });
 };
 
-const findOneNull = (params) => {
+const findNull = (params) => {
   return Promise.resolve(null);
 };
 
 module.exports = {
   findOneBuyer,
-  findOneSeller,
-  findOneNull,
+  findOneAdmin,
+  findNull,
 };

@@ -84,9 +84,9 @@ class UserController {
       // kirim email dengan parameter user register
       this.sendEmail(user);
 
-      return new this.ResponseFormat(res, 201, {
-        message: "User created",
-      });
+      return res
+        .status(200)
+        .json(new this.ResponseFormat(201, "User created"));
     } catch (error) {
       return next(error);
     }
@@ -182,9 +182,11 @@ class UserController {
       });
 
       //login
-      return new this.ResponseFormat(res, 200, {
-        accessToken,
-      });
+      return res.status(200).json(
+        new this.ResponseFormat(200, {
+          accessToken,
+        }),
+      );
     } catch (error) {
       return next(error);
     }
@@ -224,9 +226,11 @@ class UserController {
         decodedRefreshToken.id,
       );
 
-      return new this.ResponseFormat(res, 200, {
-        accessToken: newAccessToken,
-      });
+      return res.status(200).json(
+        new this.ResponseFormat(200, {
+          accessToken: newAccessToken,
+        }),
+      );
     } catch (err) {
       return next(err);
     }
@@ -239,6 +243,13 @@ class UserController {
         where: {
           id: userId,
         },
+        attributes: [
+          "id",
+          "username",
+          "email",
+          "role",
+          "address",
+        ],
       });
 
       // user not found
@@ -246,17 +257,11 @@ class UserController {
         throw new this.ErrorResponse(404, "Not found");
       }
 
-      const userData = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        address: user.address,
-      };
-
-      return new this.ResponseFormat(res, 200, {
-        user: userData,
-      });
+      return res.status(200).json(
+        new this.ResponseFormat(200, {
+          user: user,
+        }),
+      );
     } catch (err) {
       return next(err);
     }
@@ -293,9 +298,11 @@ class UserController {
       user.refresh_token = null;
       user.save();
 
-      return new this.ResponseFormat(res, 200, {
-        message: "User logged out",
-      });
+      return res.status(200).json(
+        new this.ResponseFormat(200, {
+          message: "User logged out",
+        }),
+      );
     } catch (err) {
       return next(err);
     }

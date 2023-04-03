@@ -5,9 +5,7 @@ const {
   adminRole,
   validate,
 } = require("../middleware");
-const { Op } = require("sequelize");;
-const { 
-  Item, User } = require("../database/models");
+const { Item, User } = require("../database/models");
 const {
   ErrorResponse,
   ResponseFormat,
@@ -22,11 +20,10 @@ const itemController = new ItemController(
   ErrorResponse,
   ResponseFormat,
   validate,
-  createItemSchema,
-  Op,
 );
 
 router.get("/", itemController.getItems);
+
 router.post(
   "/",
   authenticated,
@@ -34,13 +31,16 @@ router.post(
   upload.single('image'),
   itemController.createItem,
 );
+
 router.get("/:id", itemController.getItem);
+
 router.patch(
   "/:id",
   authenticated,
   adminRole,
   itemController.updateItem,
 );
+
 router.delete(
   "/:id",
   authenticated,

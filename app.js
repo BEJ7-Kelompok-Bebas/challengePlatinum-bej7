@@ -23,11 +23,11 @@ app.use((err, req, res, next) => {
     err.error || err.message || "Internal server error";
 
   return res.status(status).json({
-    status: "failed",
     data: {},
     error: error,
   });
 });
+
 const server = http.createServer(app);
 const io = socketio(server);
 const { chatRoute } = require("./routes/chat.routes");

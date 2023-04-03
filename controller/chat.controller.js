@@ -21,7 +21,7 @@ class ChatController {
 
     let roomName;
 
-    if (sender.role == "seller") {
+    if (sender.role === "admin") {
       roomName = `${r_username}${sender.username}`;
     } else {
       roomName = `${sender.username}${r_username}`;
@@ -37,7 +37,7 @@ class ChatController {
       return new ErrorResponse(404, "User Not Found");
     }
     let attr = {};
-    if (sender.role === "customer") {
+    if (sender.role === "user") {
       attr = { name: roomName, user_id: user_id };
     } else {
       attr = { name: roomName };
