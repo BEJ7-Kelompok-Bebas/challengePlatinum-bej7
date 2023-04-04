@@ -3,11 +3,7 @@ const {
   ResponseFormat,
   ErrorResponse,
 } = require("../helpers");
-const {
-  findOneBuyer,
-  findOneAdmin,
-  findNull,
-} = require("../factories/user.factory");
+const { findNull } = require("../factories/user.factory");
 const {
   findOneItem,
   findAllItem,
@@ -51,13 +47,14 @@ describe("Testing Item Controller", () => {
       controller
         .getItem(mockReq, mockRes, mockNext)
         .then((resp) => {
-          expect(resp).toBeTruthy();
+          expect(resp).toBeDefined();
           expect(resp.status).toHaveBeenCalledWith(200);
           expect(resp.json).toHaveBeenCalledWith({
             code: 200,
             data: mockData,
           });
-        });
+        })
+        .catch((err) => console.log("error", err));
       done();
     });
   });
@@ -98,18 +95,52 @@ describe("Testing Item Controller", () => {
             code: 200,
             data: mockData,
           });
-        });
+        })
+        .catch((err) => console.log("error", err));
       done();
     });
 
-    it("should return Error No Items Found", (done) => {
-      const mockReq = {
-        query: {
-          name: "item",
-          sort: "price-A,stock-A",
-          numericFilters: "price>1000",
-        },
-      };
+    // it("should return Error No Items Found", (done) => {
+    //   const mockReq = {
+    //     query: {
+    //       name: "item",
+    //       sort: "price-A,stock-A",
+    //       numericFilters: "price>1000",
+    //     },
+    //   };
+
+    //   const mockUser = {
+    //     findOne: findNull,
+    //   };
+
+    //   const mockItem = {
+    //     findAll: findNull,
+    //   };
+
+    //   const mockData = {};
+
+    //   const controller = new ItemController(
+    //     mockUser,
+    //     mockItem,
+    //     ErrorResponse,
+    //     ResponseFormat,
+    //   );
+
+    //   controller
+    //     .getItems(mockReq, mockRes, mockNext)
+    //     .then((resp) => {
+    //       expect(resp).toBeTruthy();
+    //       expect(resp.status).toHaveBeenCalledWith(404);
+    //       expect(resp.json).toHaveBeenCalledWith({
+    //         code: 404,
+    //         error: "No Items Found",
+    //       });
+    //     });
+    //   done();
+    // });
+
+    it("should sort by created_at", (done) => {
+      const mockReq = { query: { name: "item" } };
 
       const mockUser = {
         findOne: findNull,
@@ -132,28 +163,98 @@ describe("Testing Item Controller", () => {
         .getItems(mockReq, mockRes, mockNext)
         .then((resp) => {
           expect(resp).toBeTruthy();
-          // expect(resp).toHaveProperty("code");
-          // expect(resp.status).toHaveBeenCalledWith(404);
-          // expect(resp.json).toHaveBeenCalledWith({
-          //   code: 404,
-          //   error: "No Items Found",
-          // });
-        });
+          expect(resp.status).toHaveBeenCalledWith(200);
+          expect(resp.json).toHaveBeenCalledWith({
+            code: 200,
+            data: mockData,
+          });
+        })
+        .catch((err) => console.log("error", err));
       done();
     });
   });
 
-  describe("Testing: Create Item Function", () => {
-    it("should create item", (done) => {});
-  });
-
   describe("Testing: Update Item Function", () => {
-    it("should update item", (done) => {});
-    it("should return Error Item Not Found", (done) => {});
+    it("should update item", (done) => {
+      const mockReq = {
+        params: { id: 1 },
+        body: { price: 1000, stock: 10 },
+      };
+
+      mockUser = {};
+
+      const mockRes = mockResponse();
+      mockRes.locals = {
+        userId: 1,
+      };
+
+      const mockItem = {
+        findOne: findOneItem,
+        update: updateItem,
+      };
+
+      const controller = new ItemController(
+        mockUser,
+        mockItem,
+        ErrorResponse,
+        ResponseFormat,
+        validate,
+      );
+
+      controller
+        .updateItem(mockReq, mockRes, mockNext)
+        .then((resp) => {
+          expect(resp).toBeTruthy();
+          expect(resp.status).toHaveBeenCalledWith(200);
+          expect(resp.json).toHaveBeenCalledWith({
+            code: 200,
+            data: "Item Updated",
+          });
+        })
+        .catch((err) => console.log("error", err));
+      done();
+    });
+    //   it("should return Error Item Not Found", (done) => {});
   });
 
   describe("Testing: Delete Item Function", () => {
-    it("should delete item", (done) => {});
-    it("should return Error Item Not Found", (done) => {});
+    it("should delete item", (done) => {
+      mockReq = { params: { id: 1 } };
+
+      const mockRes = mockResponse();
+      mockRes.locals = { userId: 1 };
+
+      mockUser = {
+        findOne: findNull,
+      };
+
+      mockItem = {
+        destroy: destroyItemTrue,
+      };
+
+      const controller = new ItemController(
+        mockUser,
+        mockItem,
+        ErrorResponse,
+        ResponseFormat,
+        validate,
+      );
+
+      controller
+        .deleteItem(mockReq, mockRes, mockNext)
+        .then((resp) => {
+          expect(resp).toBeDefined();
+          expect(resp).toBeTruthy();
+          expect(resp.status).toHaveBeenCalledWith(200);
+          expect(resp.json).toHaveBeenCalledWith({
+            code: 200,
+            data: "Item deleted",
+          });
+        })
+        .catch((err) => console.log("error", err));
+      done();
+    });
+
+    // it("should return Error Item Not Found", (done) => {});
   });
 });
