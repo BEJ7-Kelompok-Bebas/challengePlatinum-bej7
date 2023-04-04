@@ -1,0 +1,28 @@
+name: Deploy Challenge Platinum Project
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd ${{ secrets.CHALLENGE_PATH }}
+            git pull origin master
+            docker compose down
+            docker rmi challengeplatinum-bej7-challengeplatinum:latest
+            docker rmi challengeplatinum-bej7-challengeplatinum_migration:latest
+            docker compose up -d --build

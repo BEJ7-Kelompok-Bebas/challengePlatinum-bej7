@@ -10,28 +10,20 @@ const {
   ResponseFormat,
 } = require("../helpers/");
 const {
-  registerSchema,
-  loginSchema,
-} = require("../validation/schemas");
-const {
   Hash,
   ModuleJwt,
   sendEmail,
 } = require("../modules");
 const { UserController } = require("../controller");
-const { v4: uuidv4 } = require("uuid");
 
 const userController = new UserController(
   User,
   Hash,
   ModuleJwt,
   validate,
-  registerSchema,
-  loginSchema,
   ResponseFormat,
   ErrorResponse,
   sendEmail,
-  uuidv4,
 );
 
 router.post("/register", userController.register);
