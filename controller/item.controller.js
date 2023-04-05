@@ -101,7 +101,7 @@ class ItemController {
         body: { name, price, stock },
       } = req;
       const user_id = res.locals.userId;
-      console.log("test1\n\n");
+
       await this.validate(createItemSchema, req.body);
 
       const item = await this.Item.create({
@@ -183,7 +183,7 @@ class ItemController {
 
       return res
         .status(200)
-        .json(new this.ResponseFormat(200, item));
+        .json(new this.ResponseFormat(200, "Item Updated"));
     } catch (error) {
       return next(error);
     }
@@ -202,7 +202,7 @@ class ItemController {
           user_id,
         },
       });
-      console.log(item);
+
       if (!item) {
         throw new this.ErrorResponse(404, "Item Not Found");
       }

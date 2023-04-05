@@ -9,7 +9,7 @@
     "db:create": "sequelize db:create",
     "db:migrate": "sequelize db:migrate && sequelize db:seed:all",
     "db:setup": "db:create && db:migrate",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "keywords": [],
   "author": "",
