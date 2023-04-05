@@ -109,7 +109,7 @@ class ItemController {
         body: { name, price, stock },
       } = req;
       const user_id = res.locals.userId;
-      console.log("test1\n\n");
+
       await this.validate(createItemSchema, req.body);
 
       let item = await this.Item.findOne({
