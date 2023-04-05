@@ -1,69 +1,98 @@
-class ChatController {
-  constructor(userModel, roomModel, messageModel, ioAuth) {
-    this.userModel = userModel;
-    this.roomModel = roomModel;
-    this.messageModel = messageModel;
-    this.ioAuth = ioAuth;
-  }
+const {
+  User,
+  Room,
+  Message,
+} = require("../database/models");
+const { ioAuthenticator } = require("../middleware");
 
+class ChatController {
   async startChat(socket) {
     console.log("User connected");
-    const { id: user_id } = this.ioAuth(socket);
+    //ambil user id dari header
+    const { id: user_id } = ioAuthenticator(socket);
 
-    const r_username = socket.handshake.query.r_username;
-
-    const sender = await this.userModel.findOne({
+    //cari username dari user id
+    const sender = await User.findOne({
       where: {
         id: user_id,
       },
       attributes: ["id", "username", "role"],
     });
 
-    let roomName;
+    //ambil username receiver dari handshake
+    const r_username = socket.handshake.query.r_username;
 
-    if (sender.role === "admin") {
-      roomName = `${r_username}${sender.username}`;
-    } else {
-      roomName = `${sender.username}${r_username}`;
-    }
-
-    const receiver = await this.userModel.findOne({
+    //cari user receiver
+    const receiver = await User.findOne({
       where: {
         username: r_username,
       },
     });
 
+    //cek receiver ada ato ga
     if (!receiver) {
-      return new ErrorResponse(404, "User Not Found");
-    }
-    let attr = {};
-    if (sender.role === "user") {
-      attr = { name: roomName, user_id: user_id };
-    } else {
-      attr = { name: roomName };
+      socket.to(socket.id).on("Error", {
+        message: "User Not Found",
+      });
+      socket.disconnect();
     }
 
-    let room = await this.roomModel.findOne({
-      where: attr,
+    //cari room dengan nama gabungan
+    let roomName;
+    if (sender.role === "admin") {
+      roomName = `${r_username}${sender.username}`;
+    } else {
+      console.log("test1");
+      roomName = `${sender.username}${r_username}`;
+    }
+
+    let room = await Room.findOne({
+      where: { name: roomName },
     });
 
+    //bikin room bila tidak ada
     if (!room) {
-      room = await this.roomModel.create(attr);
+      console.log("test1");
+      room = await Room.create({ name: roomName });
     }
+
     const room_id = room.id;
 
     socket.data = {
       room_id: room_id,
-      roomName: attr.name,
+      roomName: roomName,
       username: sender.username,
       id: user_id,
     };
 
-    socket.join(attr.name);
-    this.chatHistory(socket);
+    //join room
+    socket.join(roomName);
 
+    //cari chat history
+    const messages = await Message.findAll({
+      where: {
+        room_id,
+      },
+      order: [["created_at", "ASC"]],
+      include: [
+        {
+          model: User,
+          attributes: ["id", "username"],
+        },
+      ],
+    });
+
+    //send history
+    messages.forEach((element) => {
+      socket.to(roomName).emit("chatHistory", {
+        message: element.text,
+        username: element.User.username,
+      });
+    });
+
+    //send message
     socket.on("send", async (data) => {
-      const addMessage = this.messageModel.create({
+      const addMessage = Message.create({
         user_id: socket.data.id,
         text: data,
         room_id: socket.data.room_id,
@@ -79,32 +108,6 @@ class ChatController {
       console.log("User Disconnected");
     });
   }
-
-  async chatHistory(socket) {
-    const { room_id, roomName } = socket.data;
-    const messages = await this.messageModel.findAll({
-      where: {
-        room_id,
-      },
-      order: [["created_at", "ASC"]],
-      include: [
-        {
-          model: this.userModel,
-          attributes: ["id", "username"],
-        },
-      ],
-    });
-
-    messages.forEach((element) => {
-      socket.to(roomName).emit("chatHistory", {
-        message: element.text,
-        username: element.User.username,
-      });
-    });
-  }
-
-  startChat = this.startChat.bind(this);
-  chatHistory = this.chatHistory.bind(this);
 }
 
 module.exports = { ChatController };

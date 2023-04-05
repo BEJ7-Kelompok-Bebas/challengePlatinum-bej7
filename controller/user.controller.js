@@ -65,7 +65,7 @@ class UserController {
         );
       }
       // create random token
-      let randomToken = this.uuidv4();
+      let randomToken = uuidv4();
       //Hash password
       const hashedPassword = await this.Hash.hashing(
         password,
@@ -218,6 +218,7 @@ class UserController {
 
       // detected reuse or hack
       if (decodedRefreshToken.id !== user.id) {
+        console.log("error ini");
         throw new this.ErrorResponse(403, "Forbidden");
       }
 
@@ -272,9 +273,11 @@ class UserController {
       const refreshToken = req?.cookies?.jwt;
 
       if (!refreshToken) {
-        return new this.ResponseFormat(res, 200, {
-          message: "User logged out",
-        });
+        return res.status(200).json(
+          new this.ResponseFormat(200, {
+            message: "User logged out",
+          }),
+        );
       }
 
       const user = await this.User.findOne({
@@ -286,9 +289,7 @@ class UserController {
       // detected hack
       if (!user) {
         res.clearCookie("jwt");
-        return new this.ResponseFormat(res, 200, {
-          message: "User logged out",
-        });
+        throw new this.ErrorResponse(404, "User Not Found");
       }
 
       // delete token in jwt

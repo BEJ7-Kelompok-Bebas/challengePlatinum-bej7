@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 class OrderController {
   constructor(
     Order,
@@ -5,14 +6,12 @@ class OrderController {
     Item,
     ErrorResponse,
     ResponseFormat,
-    updateStock,
   ) {
     this.Order = Order;
     this.OrderItem = OrderItem;
     this.Item = Item;
     this.ErrorResponse = ErrorResponse;
     this.ResponseFormat = ResponseFormat;
-    this.updateStock = updateStock;
   }
 
   async getOrders(req, res, next) {
@@ -29,7 +28,7 @@ class OrderController {
       }
 
       if (order_id) {
-        queryObject.order_id = order_id;
+        queryObject.id = order_id;
       }
 
       const order = await this.Order.findAll({
@@ -47,7 +46,7 @@ class OrderController {
         },
       });
 
-      if (!order) {
+      if (order.length === 0) {
         throw new this.ErrorResponse(
           400,
           "There is no orders",
@@ -65,12 +64,10 @@ class OrderController {
   /** create order json example
      * {
         "data":[{
-            "order_id":0,
             "item_id":2,
             "qty":5,
             "price":8000
         },{
-            "order_id":0,
             "item_id":7,
             "qty":3,
             "price":23000
@@ -81,6 +78,23 @@ class OrderController {
     try {
       const user_id = res.locals.userId;
       const orderItems = req.body.data;
+
+      for (let i = 0; i < orderItems.length; i++) {
+        let item = await this.Item.findOne({
+          where: {
+            id: orderItems[i].item_id,
+            stock: {
+              [Op.gt]: 0,
+            },
+          },
+        });
+        if (!item) {
+          throw new this.ErrorResponse(
+            404,
+            "Item can't be ordered",
+          );
+        }
+      }
 
       let total = 0;
 
@@ -127,13 +141,14 @@ class OrderController {
       });
 
       if (getOrder) {
-        this.updateStock(getOrder, this.Item, false);
+        this.updateStock(getOrder, false);
       }
 
       return res
         .status(201)
         .json(new this.ResponseFormat(201, getOrder));
     } catch (error) {
+      console.log(error);
       return next(error);
     }
   }
@@ -173,7 +188,7 @@ class OrderController {
       }
 
       if (status === "Cancelled") {
-        this.updateStock(order, this.Item, true);
+        this.updateStock(order, true);
       }
 
       await this.Order.update(
@@ -219,9 +234,16 @@ class OrderController {
         ],
       });
 
+      if (!order) {
+        throw new this.ErrorResponse(
+          404,
+          "Order Not Found",
+        );
+      }
+
       // update stock item
       if (order) {
-        this.updateStock(order, this.Item, true);
+        this.updateStock(order, true);
       }
 
       const orderUpdate = await this.Order.update(
@@ -239,7 +261,7 @@ class OrderController {
           order_id: order_id,
         },
       });
-      console.log("test6");
+
       await this.Order.destroy({
         where: {
           user_id,
@@ -257,10 +279,37 @@ class OrderController {
     }
   }
 
+  async updateStock(orders, args) {
+    let stocks = [];
+    let item_ids = [];
+    const orderItem = orders.OrderItems;
+
+    orderItem.forEach((data) => {
+      if (args) {
+        stocks.push(data.Item.stock + data.qty);
+      } else {
+        stocks.push(data.Item.stock - data.qty);
+      }
+      item_ids.push(data.item_id);
+    });
+
+    for (let i = 0; i < stocks.length - 1; i++) {
+      await this.Item.update(
+        { stock: stocks[i] },
+        {
+          where: {
+            id: item_ids[i],
+          },
+        },
+      );
+    }
+  }
+
   getOrders = this.getOrders.bind(this);
   createOrder = this.createOrder.bind(this);
   updateOrder = this.updateOrder.bind(this);
   deleteOrder = this.deleteOrder.bind(this);
+  updateStock = this.updateStock.bind(this);
 }
 
 module.exports = { OrderController };

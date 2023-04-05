@@ -1,28 +1,31 @@
 const { Model, DataTypes } = require("sequelize");
-const sequelize = require('./sequelize')
+const sequelize = require("./sequelize");
 
-class Order extends Model {
-}
+class Order extends Model {}
 
 Order.init(
   {
     id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
     user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        field: 'user_id'
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: "user_id",
     },
     total: {
-        type: DataTypes.DOUBLE,
-        allowNull: false
+      type: DataTypes.DOUBLE,
+      allowNull: false,
     },
     status: {
-        type: DataTypes.ENUM("Pending","Complete","Cancelled"),
-        defaultValue: "Pending"
+      type: DataTypes.ENUM(
+        "Pending",
+        "Cancelled",
+        "Complete",
+      ),
+      defaultValue: "Pending",
     },
   },
   {
@@ -30,10 +33,10 @@ Order.init(
     timestamps: true,
     paranoid: true,
     underscored: true,
-    deletedAt: 'deleted_at',
-    updatedAt: 'updated_at',
-    createdAt: 'created_at',
+    deletedAt: "deleted_at",
+    updatedAt: "updated_at",
+    createdAt: "created_at",
   },
-)
+);
 
-module.exports = Order
+module.exports = Order;

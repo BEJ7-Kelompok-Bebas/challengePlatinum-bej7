@@ -12,7 +12,7 @@ class ModuleJwt {
       },
       secretKey,
       {
-        expiresIn: "600s",
+        expiresIn: "30d",
       },
     );
     return accessToken;

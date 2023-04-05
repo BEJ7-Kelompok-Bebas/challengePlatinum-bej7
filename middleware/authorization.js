@@ -72,7 +72,7 @@ const ioAuthenticator = (socket) => {
     socket.handshake.headers.authorization?.split(" ")[1];
 
   if (!accessToken) {
-    return new ErrorResponse(401, "Unauthorized");
+    throw new ErrorResponse(401, "Unauthorized");
   }
 
   const decodedAccessToken =
@@ -80,7 +80,7 @@ const ioAuthenticator = (socket) => {
 
   if (!decodedAccessToken) {
     console.log("test3");
-    return new ErrorResponse(401, "Unauthorized");
+    throw new ErrorResponse(401, "Unauthorized");
   }
 
   return decodedAccessToken;

@@ -13,7 +13,6 @@ const {
   ErrorResponse,
   ResponseFormat,
 } = require("../helpers");
-const { updateStock } = require("../modules");
 const { OrderController } = require("../controller");
 
 const orderController = new OrderController(
@@ -22,7 +21,6 @@ const orderController = new OrderController(
   Item,
   ErrorResponse,
   ResponseFormat,
-  updateStock,
 );
 
 router.get(

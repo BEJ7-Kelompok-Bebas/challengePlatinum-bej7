@@ -1,5 +1,5 @@
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('./sequelize');
+const { Model, DataTypes } = require("sequelize");
+const sequelize = require("./sequelize");
 
 class User extends Model {}
 
@@ -16,7 +16,7 @@ User.init(
     },
     username: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
@@ -39,7 +39,11 @@ User.init(
       allowNull: true,
     },
     register_status: {
-      type: DataTypes.ENUM("Validated", "Pending", "Cancelled"),
+      type: DataTypes.ENUM(
+        "Validated",
+        "Pending",
+        "Cancelled",
+      ),
       allowNull: false,
       defaultValue: "Pending",
     },
@@ -53,9 +57,9 @@ User.init(
     timestamps: true,
     paranoid: true,
     underscored: true,
-    deletedAt: 'deleted_at',
-    updatedAt: 'updated_at',
-    createdAt: 'created_at',
+    deletedAt: "deleted_at",
+    updatedAt: "updated_at",
+    createdAt: "created_at",
   },
 );
 

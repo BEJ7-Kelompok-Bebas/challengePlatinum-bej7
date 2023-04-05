@@ -45,14 +45,6 @@ OrderItem.belongsTo(Order, {
 Order.belongsToMany(Item, { through: OrderItem });
 Item.belongsToMany(Order, { through: OrderItem });
 
-// User - Room
-User.hasMany(Room, {
-  foreignKey: "user_id",
-});
-Room.belongsTo(User, {
-  foreignKey: "user_id",
-});
-
 // User - Message
 User.hasMany(Message, {
   foreignKey: "user_id",
@@ -68,6 +60,10 @@ Room.hasMany(Message, {
 Message.belongsTo(Room, {
   foreignKey: "room_id",
 });
+
+// User - Room
+User.belongsToMany(Room, { through: Message });
+Room.belongsToMany(User, { through: Message });
 
 module.exports = {
   User,
