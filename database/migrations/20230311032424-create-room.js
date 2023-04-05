@@ -9,14 +9,6 @@ module.exports = {
         autoIncrement: true,
         type: Sequelize.INTEGER,
       },
-      sender: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: "users",
-          key: "id",
-          as: "sender",
-        },
-      },
       name: {
         type: Sequelize.STRING,
         allowNull: false,

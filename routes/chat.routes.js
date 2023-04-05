@@ -1,17 +1,6 @@
-const {
-  User,
-  Room,
-  Message,
-} = require("../database/models");
-const { ioAuthenticator } = require("../middleware");
 const { ChatController } = require("../controller");
 
-const chatController = new ChatController(
-  User,
-  Room,
-  Message,
-  ioAuthenticator,
-);
+const chatController = new ChatController();
 
 const chatRoute = (io) => {
   io.of("/chat").on("connection", (socket) => {

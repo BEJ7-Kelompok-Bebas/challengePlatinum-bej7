@@ -14,11 +14,6 @@ Room.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      field: "user_id",
-    },
   },
   {
     sequelize: sequelize,
