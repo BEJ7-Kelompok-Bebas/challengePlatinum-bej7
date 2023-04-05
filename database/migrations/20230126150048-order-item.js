@@ -1,22 +1,22 @@
-'use strict';
+"use strict";
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('order_items', {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable("order_items", {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
-      order_id:{
+      order_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
           model: "orders",
           key: "id",
-          as: "order_id"
-        }
+          as: "order_id",
+        },
       },
       item_id: {
         type: Sequelize.INTEGER,
@@ -24,33 +24,32 @@ module.exports = {
         references: {
           model: "items",
           key: "id",
-          as: "item_id"
-        }
+          as: "item_id",
+        },
       },
       qty: {
         type: Sequelize.INTEGER,
-        defaultValue: 1
+        defaultValue: 1,
       },
       price: {
         type: Sequelize.DOUBLE,
-        allowNull: false
+        allowNull: false,
       },
       created_at: {
         type: Sequelize.DATE,
-        defaultValue: Date.now()
+        defaultValue: Date.now(),
       },
       updated_at: {
         type: Sequelize.DATE,
-        defaultValue: Date.now()
+        defaultValue: Date.now(),
       },
       deleted_at: {
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
-  
   },
 
-  async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('order_items');
-  }
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable("order_items");
+  },
 };
