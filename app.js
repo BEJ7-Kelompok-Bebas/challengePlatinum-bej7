@@ -6,6 +6,11 @@ const userRouter = require("./routes/user.routes");
 const itemRouter = require("./routes/item.routes");
 const orderRouter = require("./routes/order.routes");
 
+//swagger
+const swaggerUI = require("swagger-ui-express");
+const YAML = require("yamljs");
+const swaggerDoc = YAML.load("./swagger.yaml");
+
 const app = express();
 
 app.use(express.json());
@@ -14,6 +19,18 @@ app.use(cookieParser());
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/item", itemRouter);
 app.use("/api/v1/order", orderRouter);
+
+//serve swagger
+app.use(
+  "/docs-api",
+  swaggerUI.serve,
+  swaggerUI.setup(swaggerDoc),
+);
+app.get("/", (req, res) => {
+  res.send(
+    '<h1>Challenge API</h1><a href="/docs-api">Documentation</a>',
+  );
+});
 
 app.use((err, req, res, next) => {
   console.log(err);
