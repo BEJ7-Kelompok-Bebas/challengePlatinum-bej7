@@ -7,7 +7,6 @@ module.exports = {
       "order_items",
       [
         {
-          id: 1,
           order_id: 1,
           item_id: 1,
           qty: 5,
@@ -16,7 +15,6 @@ module.exports = {
           updated_at: new Date(),
         },
         {
-          id: 2,
           order_id: 1,
           item_id: 2,
           qty: 1,
@@ -25,7 +23,6 @@ module.exports = {
           updated_at: new Date(),
         },
         {
-          id: 3,
           order_id: 2,
           item_id: 1,
           qty: 5,
@@ -34,7 +31,6 @@ module.exports = {
           updated_at: new Date(),
         },
         {
-          id: 4,
           order_id: 2,
           item_id: 2,
           qty: 1,
@@ -43,7 +39,6 @@ module.exports = {
           updated_at: new Date(),
         },
         {
-          id: 5,
           order_id: 3,
           item_id: 2,
           qty: 2,
@@ -52,7 +47,6 @@ module.exports = {
           updated_at: new Date(),
         },
         {
-          id: 6,
           order_id: 3,
           item_id: 3,
           qty: 2,
