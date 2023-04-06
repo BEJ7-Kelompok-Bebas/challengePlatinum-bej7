@@ -18,13 +18,14 @@ app.use("/api/v1/order", orderRouter);
 app.use((err, req, res, next) => {
   console.log(err);
 
-  const status = err.status || 500;
+  const status = err.code || 500;
   const error =
     err.error || err.message || "Internal server error";
 
   return res.status(status).json({
-    data: {},
+    code: status,
     error: error,
+    data: {},
   });
 });
 

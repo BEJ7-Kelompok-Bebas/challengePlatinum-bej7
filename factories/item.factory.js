@@ -11,56 +11,6 @@ const dataOneItem = {
   },
 };
 
-const findOneItem = (params) => {
-  return Promise.resolve(dataOneItem);
-};
-
-const updateItem = (params) => {
-  return Promise.resolve({
-    id: 1,
-    user_id: 1,
-    name: "item1",
-    price: 1000,
-    stock: 10,
-    User: {
-      id: 1,
-      username: "admin",
-      email: "admin@gmail.com",
-    },
-  });
-};
-
-const sortedItem = [
-  {
-    id: 1,
-    user_id: 1,
-    name: "item1",
-    price: 5000,
-    stock: 200,
-    created_at: new Date("2023-04-02"),
-    updated_at: new Date("2023-04-02"),
-    User: {
-      id: 1,
-      username: "admin",
-      email: "admin@gmail.com",
-    },
-  },
-  {
-    id: 2,
-    user_id: 1,
-    name: "item2",
-    price: 15000,
-    stock: 100,
-    created_at: new Date("2023-04-03"),
-    updated_at: new Date("2023-04-03"),
-    User: {
-      id: 1,
-      username: "admin",
-      email: "admin@gmail.com",
-    },
-  },
-];
-
 const dataAllItem = [
   {
     id: 5,
@@ -124,30 +74,64 @@ const dataAllItem = [
   },
 ];
 
+const sortedData = [
+  {
+    id: 1,
+    user_id: 1,
+    name: "item1",
+    price: 5000,
+    stock: 200,
+    created_at: new Date("2023-04-03"),
+    updated_at: new Date("2023-04-03"),
+    User: {
+      id: 1,
+      username: "admin",
+      email: "admin@gmail.com",
+    },
+  },
+  {
+    id: 2,
+    user_id: 1,
+    name: "item2",
+    price: 15000,
+    stock: 100,
+    created_at: new Date("2023-04-04"),
+    updated_at: new Date("2023-04-04"),
+    User: {
+      id: 1,
+      username: "admin",
+      email: "admin@gmail.com",
+    },
+  },
+];
+
+const findOneItem = (params) => {
+  return Promise.resolve(dataOneItem);
+};
+
 const findAllItemQuerySort = (params) => {
   return Promise.resolve(dataAllItem);
 };
 
 const findAllItemAutoSort = (params) => {
-  return Promise.resolve(sortedItem);
+  return Promise.resolve(sortedData);
+};
+
+const updateItem = (params) => {
+  return Promise.resolve(true);
 };
 
 const destroyItemTrue = (params) => {
-  return Promise.resolve(1);
-};
-
-const destroyItemFalse = (params) => {
-  return Promise.resolve(0);
+  return Promise.resolve(true);
 };
 
 module.exports = {
+  destroyItemTrue,
   findOneItem,
   findAllItemQuerySort,
   findAllItemAutoSort,
   updateItem,
-  destroyItemFalse,
-  destroyItemTrue,
   dataAllItem,
   dataOneItem,
-  sortedItem,
+  sortedData,
 };
