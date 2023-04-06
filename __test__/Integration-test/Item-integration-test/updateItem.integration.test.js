@@ -32,5 +32,22 @@ describe("Integration Testing: Item Controller", () => {
       expect(resp.body.code).toBe(404);
       expect(resp.body.error).toEqual("Item Not Found");
     });
+
+    it("should return Error Forbidden", async () => {
+      const token = await ModuleJwt.signToken(2);
+      const idParams = 5;
+      const resp = await request(app)
+        .patch(`/api/v1/item/${idParams}`)
+        .set("content-Type", "application/json")
+        .set("Accept", "application/json")
+        .set("Authorization", `Bearer ${token}`)
+        .send({ price: 1000 });
+
+      //   console.log(resp);
+      expect(resp.body).toHaveProperty("code");
+      expect(resp.body).toHaveProperty("error");
+      expect(resp.body.code).toBe(403);
+      expect(resp.body.error).toEqual("Forbidden");
+    });
   });
 });

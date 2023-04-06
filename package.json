@@ -10,7 +10,7 @@
     "db:migrate": "sequelize db:migrate",
     "db:seed": "sequelize db:seed:all",
     "db:setup": "npm run db:create && npm run db:migrate",
-    "test": "jest --coverage --runInBand"
+    "test": "jest --coverage --runInBand --verbose"
   },
   "keywords": [],
   "author": "",
