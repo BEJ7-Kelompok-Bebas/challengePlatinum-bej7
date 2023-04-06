@@ -216,6 +216,12 @@ class UserController {
       const decodedRefreshToken =
         this.ModuleJwt.verifyRefreshToken(refreshToken);
 
+      // detected reuse or hack
+      if (decodedRefreshToken.id !== user.id) {
+        console.log("error ini");
+        throw new this.ErrorResponse(403, "Forbidden");
+      }
+
       // issue new acces token
       const newAccessToken = this.ModuleJwt.signToken(
         decodedRefreshToken.id,

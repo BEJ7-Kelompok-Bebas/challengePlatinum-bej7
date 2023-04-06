@@ -7,6 +7,7 @@ module.exports = {
       "orders",
       [
         {
+          id: 1,
           user_id: 2,
           total: 65000,
           status: "Complete",
@@ -14,6 +15,7 @@ module.exports = {
           updated_at: new Date(),
         },
         {
+          id: 2,
           user_id: 2,
           total: 65000,
           status: "Cancelled",
@@ -21,6 +23,7 @@ module.exports = {
           updated_at: new Date(),
         },
         {
+          id: 3,
           user_id: 3,
           total: 80000,
           status: "Pending",
