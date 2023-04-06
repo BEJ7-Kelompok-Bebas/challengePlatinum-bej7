@@ -64,5 +64,22 @@ describe("Integration Testing: User Controller", () => {
       expect(resp.body.code).toBe(401);
       expect(resp.body.error).toEqual("Invalid Credential");
     });
+
+    test("should return validation error", async () => {
+      const resp = await request(app)
+        .post("/api/v1/user/login")
+        .set("content-Type", "application/json")
+        .set("Accept", "application/json")
+        .send({
+          email: "admin1@gmail.com",
+        });
+
+      expect(resp.body).toHaveProperty("code");
+      expect(resp.body).toHaveProperty("error");
+      expect(resp.body.code).toBe(400);
+      expect(resp.body.error[0].message).toEqual(
+        '"password" is required',
+      );
+    });
   });
 });

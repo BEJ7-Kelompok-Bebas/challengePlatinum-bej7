@@ -1,0 +1,460 @@
+openapi: 3.0.0
+info:
+  title: Challenge-Platinum-Binar
+  contact: {}
+  version: "1.0"
+servers:
+  - url: 103.49.239.21:3002/api/v1/
+    variables: {}
+paths:
+  /user/register:
+    post:
+      tags:
+        - User
+      summary: Register User
+      operationId: RegisterUser
+      parameters: []
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/RegisterUserRequest"
+                - example:
+                    email: user1@gmail.com
+                    password: "12345678"
+                    phone: "097238671232"
+                    username: user1
+                    address: Indo
+                    role: user
+            example:
+              email: user1@gmail.com
+              password: "12345678"
+              phone: "097238671232"
+              username: user1
+              address: Indo
+              role: user
+        required: true
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+      security: []
+  /user/login:
+    post:
+      tags:
+        - User
+      summary: Login User
+      operationId: LoginUser
+      parameters: []
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/LoginUserRequest"
+                - example:
+                    email: admin1@gmail.com
+            example:
+              email: admin1@gmail.com
+        required: true
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+      security: []
+  /user/refresh-token:
+    get:
+      tags:
+        - User
+      summary: refresh-token
+      operationId: refresh-token
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+  /user/current-user:
+    get:
+      tags:
+        - User
+      summary: current User
+      operationId: currentUser
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+  /user/logout:
+    get:
+      tags:
+        - User
+      summary: logout
+      operationId: logout
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+  /item:
+    post:
+      tags:
+        - Item
+      summary: create Item
+      operationId: createItem
+      parameters: []
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/createItemRequest"
+                - example:
+                    name: test
+                    price: 23000
+                    stock: 100
+            example:
+              name: test
+              price: 23000
+              stock: 100
+        required: true
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+    get:
+      tags:
+        - Item
+      summary: get Items
+      operationId: getItems
+      parameters:
+        - name: sort
+          in: query
+          description: ""
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: price-A,stock-D
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+      security: []
+  /item/{id}:
+    get:
+      tags:
+        - Item
+      summary: get Item
+      operationId: getItem
+      parameters:
+        - name: id
+          in: path
+          description: ""
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: "null"
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+      security: []
+    delete:
+      tags:
+        - Item
+      summary: delete Item
+      operationId: deleteItem
+      parameters:
+        - name: id
+          in: path
+          description: ""
+          required: true
+          style: simple
+          schema:
+            type: integer
+            format: int32
+            example: 6
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+    patch:
+      tags:
+        - Item
+      summary: Update item
+      operationId: Updateitem
+      parameters:
+        - name: id
+          in: path
+          description: ""
+          required: true
+          style: simple
+          schema:
+            type: integer
+            format: int32
+            example: 4
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/UpdateitemRequest"
+                - example:
+                    price: 10000
+            example:
+              price: 10000
+        required: true
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+  /order:
+    get:
+      tags:
+        - Order
+      summary: Get Orders
+      operationId: GetOrders
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+    post:
+      tags:
+        - Order
+      summary: Create Orders
+      operationId: CreateOrders
+      parameters: []
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/CreateOrdersRequest"
+                - example:
+                    data:
+                      - item_id: 2
+                        qty: 2
+                        price: 5500
+                      - item_id: 4
+                        qty: 1
+                        price: 8500
+            example:
+              data:
+                - item_id: 2
+                  qty: 2
+                  price: 5500
+                - item_id: 4
+                  qty: 1
+                  price: 8500
+        required: true
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+  /order/{id}/update:
+    patch:
+      tags:
+        - Order
+      summary: Update order
+      operationId: Updateorder
+      parameters:
+        - name: id
+          in: path
+          description: ""
+          required: true
+          style: simple
+          schema:
+            type: integer
+            format: int32
+            example: 3
+      requestBody:
+        description: ""
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/UpdateorderRequest"
+                - example:
+                    status: Complete
+            example:
+              status: Complete
+        required: true
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+  /order/{id}:
+    delete:
+      tags:
+        - Order
+      summary: delete order
+      operationId: deleteorder
+      parameters:
+        - name: id
+          in: path
+          description: ""
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: "null"
+      responses:
+        "200":
+          description: ""
+          headers: {}
+      deprecated: false
+components:
+  schemas:
+    RegisterUserRequest:
+      title: RegisterUserRequest
+      required:
+        - email
+        - password
+        - phone
+        - username
+        - address
+        - role
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        phone:
+          type: string
+        username:
+          type: string
+        address:
+          type: string
+        role:
+          type: string
+      example:
+        email: user1@gmail.com
+        password: "12345678"
+        phone: "097238671232"
+        username: user1
+        address: Indo
+        role: user
+    LoginUserRequest:
+      title: LoginUserRequest
+      required:
+        - email
+      type: object
+      properties:
+        email:
+          type: string
+      example:
+        email: admin1@gmail.com
+    createItemRequest:
+      title: createItemRequest
+      required:
+        - name
+        - price
+        - stock
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          type: integer
+          format: int32
+        stock:
+          type: integer
+          format: int32
+      example:
+        name: test
+        price: 23000
+        stock: 100
+    UpdateitemRequest:
+      title: UpdateitemRequest
+      required:
+        - price
+      type: object
+      properties:
+        price:
+          type: integer
+          format: int32
+      example:
+        price: 10000
+    CreateOrdersRequest:
+      title: CreateOrdersRequest
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Datum"
+          description: ""
+      example:
+        data:
+          - item_id: 2
+            qty: 2
+            price: 5500
+          - item_id: 4
+            qty: 1
+            price: 8500
+    Datum:
+      title: Datum
+      required:
+        - item_id
+        - qty
+        - price
+      type: object
+      properties:
+        item_id:
+          type: integer
+          format: int32
+        qty:
+          type: integer
+          format: int32
+        price:
+          type: integer
+          format: int32
+      example:
+        item_id: 2
+        qty: 2
+        price: 5500
+    UpdateorderRequest:
+      title: UpdateorderRequest
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          type: string
+      example:
+        status: Complete
+  securitySchemes:
+    httpBearer:
+      type: http
+      scheme: bearer
+security:
+  - httpBearer: []
+tags:
+  - name: User
+  - name: Item
+  - name: Order
