@@ -125,10 +125,12 @@ class UserController {
       // users.is_verified = true;
       // users.verification_token = null;
       // await users.save();
-      return new this.ResponseFormat(res, 200, {
-        message:
+      return res.status(200).json(
+        new this.ResponseFormat(200, {
+          message:
           "Email berhasil terverifikasi. Register Berhasil ",
-      });
+        }),
+      );
     } catch (error) {
       console.error(error);
       return next(error);
@@ -310,6 +312,7 @@ class UserController {
   }
   register = this.register.bind(this);
   login = this.login.bind(this);
+  confirmRegister = this.confirmRegister.bind(this);
   refreshToken = this.refreshToken.bind(this);
   currentUser = this.currentUser.bind(this);
   logout = this.logout.bind(this);
