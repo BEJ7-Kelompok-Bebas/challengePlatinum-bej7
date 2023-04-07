@@ -5,11 +5,13 @@ const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/user.routes");
 const itemRouter = require("./routes/item.routes");
 const orderRouter = require("./routes/order.routes");
+const cors = require("cors");
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/item", itemRouter);
