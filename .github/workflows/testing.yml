@@ -1,0 +1,27 @@
+name: Automation Testing
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  testing:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Setup node env
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 16
+          check-latest: true
+
+      - name: Install dependencies 👨🏻‍💻
+        run: npm install
+
+      - name: Run Testing
+        run: npm run test
