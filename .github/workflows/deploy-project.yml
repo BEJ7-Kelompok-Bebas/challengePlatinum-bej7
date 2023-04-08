@@ -29,3 +29,23 @@ jobs:
             docker rmi challengeplatinum-bej7-test_db:latest
             docker rmi challengeplatinum-bej7-test_migration:latest
             docker compose up -d --build
+
+  testing:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Setup node env
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 16
+          check-latest: true
+
+      - name: Install dependencies 👨🏻‍💻
+        run: npm install
+
+      - name: Run Testing
+        run: npm run test
