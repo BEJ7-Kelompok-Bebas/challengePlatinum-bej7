@@ -10,8 +10,11 @@ services:
     depends_on:
       - challengeplatinum_db
       - challengeplatinum_migration
+      - test_db
+      - test_migration
     env_file:
-      - .env
+      - .env.production
+      - .env.test
     command: sh -c "npm run start:dev"
     volumes:
       - type: volume
@@ -28,8 +31,8 @@ services:
     depends_on:
       - challengeplatinum_db
     env_file:
-      - .env
-    command: sh -c "npm run db:migrate && npm run db:seed"
+      - .env.production
+    command: sh -c "npm run db:setup:prod"
     restart: on-failure
 
   challengeplatinum_db:
@@ -37,8 +40,27 @@ services:
     ports:
       - 5437:5432
     environment:
-      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_PASSWORD=951235
       - POSTGRES_DB=challenge
+
+  test_migration:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    depends_on:
+      - test_db
+    env_file:
+      - .env.test
+    command: sh -c "npm run db:setup:test"
+    restart: on-failure
+
+  test_db:
+    image: postgres:14
+    ports:
+      - 5436:5432
+    environment:
+      - POSTGRES_PASSWORD=951235
+      - POSTGRES_DB=challenge_test
 
 volumes:
   challengeplatinum_volume:

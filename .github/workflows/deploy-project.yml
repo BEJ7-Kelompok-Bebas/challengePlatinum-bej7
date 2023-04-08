@@ -25,4 +25,6 @@ jobs:
             docker compose down
             docker rmi challengeplatinum-bej7-challengeplatinum:latest
             docker rmi challengeplatinum-bej7-challengeplatinum_migration:latest
+            docker rmi challengeplatinum-bej7-test_db:latest
+            docker rmi challengeplatinum-bej7-test_migration:latest
             docker compose up -d --build
