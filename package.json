@@ -4,13 +4,24 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index",
-    "start:dev": "nodemon index",
-    "db:create": "sequelize db:create",
-    "db:migrate": "sequelize db:migrate",
-    "db:seed": "sequelize db:seed:all",
-    "db:setup": "npm run db:create && npm run db:migrate",
-    "test": "jest --coverage --runInBand --verbose"
+    "start": "cross-env NODE_ENV=production nodemon index",
+    "start:dev": "cross-env NODE_ENV=development nodemon index",
+    "test": "cross-env NODE_ENV=test jest --coverage --runInBand --verbose",
+    "db:create:dev": "cross-env NODE_ENV=development sequelize db:create",
+    "db:create:prod": "cross-env NODE_ENV=production sequelize db:create",
+    "db:create:test": "cross-env NODE_ENV=test sequelize db:create",
+    "db:migrate:dev": "cross-env NODE_ENV=development sequelize db:migrate",
+    "db:migrate:test": "cross-env NODE_ENV=test sequelize db:migrate",
+    "db:migrate:prod": "cross-env NODE_ENV=production sequelize db:migrate",
+    "db:seed:dev": "cross-env NODE_ENV=development sequelize db:seed:all",
+    "db:seed:test": "cross-env NODE_ENV=test sequelize db:seed:all",
+    "db:seed:prod": "cross-env NODE_ENV=production sequelize db:seed:all",
+    "db:setup:dev": "npm run db:create:dev && npm run db:migrate:dev && npm run db:seed:dev",
+    "db:setup:prod": "npm run db:create:prod && npm run db:migrate:prod && npm run db:seed:prod",
+    "db:setup:test": "npm run db:create:test && npm run db:migrate:test && npm run db:seed:test",
+    "db:drop:dev": "cross-env NODE_ENV=development sequelize db:drop",
+    "db:drop:prod": "cross-env NODE_ENV=production sequelize db:drop",
+    "db:drop:test": "cross-env NODE_ENV=test sequelize db:drop"
   },
   "keywords": [],
   "author": "",
@@ -28,8 +39,6 @@
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
     "passport": "^0.6.0",
-    "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0",
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.28.0",
@@ -41,6 +50,7 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "nodemon": "^2.0.20",
     "sequelize-cli": "^6.6.0"
   }
