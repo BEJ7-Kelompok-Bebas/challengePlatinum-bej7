@@ -44,7 +44,7 @@ jobs:
           cache: "npm"
 
       - name: Go to docker terminal
-        run: npm go:docker:terminal
+        run: npm run go:docker:terminal
 
       - name: run test
-        run: npm test
+        run: npm run test
