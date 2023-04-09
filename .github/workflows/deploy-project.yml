@@ -43,8 +43,5 @@ jobs:
           check-latest: true
           cache: "npm"
 
-      - name: Go to docker terminal
-        run: npm run go:docker:terminal
-
       - name: run test
         run: npm run test
