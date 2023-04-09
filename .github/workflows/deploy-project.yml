@@ -43,12 +43,8 @@ jobs:
           check-latest: true
           cache: "npm"
 
-      - name: Start Testing
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          script: |
-            cd ${{ secrets.CHALLENGE_PATH }}
-            npm run test
+      - name: Go to docker terminal
+        run: npm go:docker:terminal
+
+      - name: run test
+        run: npm test
