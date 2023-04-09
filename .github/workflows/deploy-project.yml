@@ -26,8 +26,6 @@ jobs:
             docker compose down
             docker rmi challengeplatinum-bej7-challengeplatinum:latest
             docker rmi challengeplatinum-bej7-challengeplatinum_migration:latest
-            docker rmi challengeplatinum-bej7-test_db:latest
-            docker rmi challengeplatinum-bej7-test_migration:latest
             docker compose up -d --build
 
   testing:
@@ -43,9 +41,14 @@ jobs:
         with:
           node-version: 16
           check-latest: true
+          cache: "npm"
 
-      - name: Install dependencies 👨🏻‍💻
-        run: npm install
-
-      - name: Run Testing
-        run: npm run test
+      - name: Start Testing
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd ${{ secrets.CHALLENGE_PATH }}
+            npm run test

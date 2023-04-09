@@ -1,6 +1,8 @@
 // import library
 const Sib = require("sib-api-v3-sdk");
-require("dotenv").config({ path: ".env" });
+require("dotenv").config({
+  path: `.env.${process.env.NODE_ENV}`,
+});
 // declare Client
 defaultClient = Sib.ApiClient.instance;
 

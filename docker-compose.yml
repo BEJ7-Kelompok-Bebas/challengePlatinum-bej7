@@ -11,7 +11,7 @@ services:
       - challengeplatinum_db
       - challengeplatinum_migration
     env_file:
-      - .env
+      - .env.production
     command: sh -c "npm run start:dev"
     volumes:
       - type: volume
@@ -28,14 +28,14 @@ services:
     depends_on:
       - challengeplatinum_db
     env_file:
-      - .env
-    command: sh -c "npm run db:migrate && npm run db:seed"
+      - .env.production
+    command: sh -c "npm run db:migrate:prod && npm run db:seed:prod"
     restart: on-failure
 
   challengeplatinum_db:
     image: postgres:14
     ports:
-      - 5437:5432
+      - 5432:5432
     environment:
       - POSTGRES_PASSWORD=12345678
       - POSTGRES_DB=challenge

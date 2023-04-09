@@ -7,6 +7,11 @@ const itemRouter = require("./routes/item.routes");
 const orderRouter = require("./routes/order.routes");
 const cors = require("cors");
 
+//Swagger
+const swaggerUI = require("swagger-ui-express");
+const YAML = require("yamljs");
+const swaggerDocs = YAML.load("./swagger.yml");
+
 const app = express();
 
 app.use(express.json());
@@ -16,6 +21,12 @@ app.use(cors());
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/item", itemRouter);
 app.use("/api/v1/order", orderRouter);
+
+app.use(
+  "/api-docs",
+  swaggerUI.serve,
+  swaggerUI.setup(swaggerDocs),
+);
 
 app.use((err, req, res, next) => {
   console.log(err);
