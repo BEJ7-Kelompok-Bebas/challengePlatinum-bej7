@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    name: build
     runs-on: ubuntu-latest
 
     steps:
@@ -26,3 +27,21 @@ jobs:
             docker rmi challengeplatinum-bej7-challengeplatinum:latest
             docker rmi challengeplatinum-bej7-challengeplatinum_migration:latest
             docker compose up -d --build
+
+  testing:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Setup node env
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 16
+          check-latest: true
+          cache: "npm"
+
+      - name: run test
+        run: npm run test
