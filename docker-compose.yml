@@ -11,7 +11,7 @@ services:
       - challengeplatinum_db
       - challengeplatinum_migration
     env_file:
-      - .env.production
+      - .env
     command: sh -c "npm run start:dev"
     volumes:
       - type: volume
