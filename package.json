@@ -4,13 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": " nodemon index",
-    "start:dev": " nodemon index",
-    "test": "test jest --coverage --runInBand --verbose",
-    "db:create": " sequelize db:create",
-    "db:migrate": " sequelize db:migrate",
-    "db:seed": " sequelize db:seed:all",
-    "db:setup": "npm run db:create && npm run db:migrate && npm run db:seed"
+    "start": "node index",
+    "start:dev": "nodemon index",
+    "db:create": "sequelize db:create",
+    "db:migrate": "sequelize db:migrate",
+    "db:seed": "sequelize db:seed:all",
+    "db:setup": "npm run db:create && npm run db:migrate",
+    "test": "jest --coverage --runInBand --verbose"
   },
   "keywords": [],
   "author": "",
