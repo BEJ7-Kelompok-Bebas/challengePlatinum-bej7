@@ -28,8 +28,8 @@ services:
     depends_on:
       - challengeplatinum_db
     env_file:
-      - .env.production
-    command: sh -c "npm run db:migrate:prod && npm run db:seed:prod"
+      - .env
+    command: sh -c "npm run db:migrate && npm run db:seed"
     restart: on-failure
 
   challengeplatinum_db:
