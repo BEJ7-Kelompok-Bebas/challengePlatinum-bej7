@@ -35,7 +35,7 @@ services:
   challengeplatinum_db:
     image: postgres:14
     ports:
-      - 5432:5432
+      - 5437:5432
     environment:
       - POSTGRES_PASSWORD=12345678
       - POSTGRES_DB=challenge
