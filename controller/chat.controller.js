@@ -3,6 +3,7 @@ const {
   Room,
   Message,
 } = require("../database/models");
+const { ErrorResponse } = require("../helpers");
 const { ioAuthenticator } = require("../middleware");
 
 class ChatController {
@@ -27,22 +28,22 @@ class ChatController {
       where: {
         username: r_username,
       },
+      attributes: ["id", "username", "role"],
     });
 
     //cek receiver ada ato ga
-    if (!receiver) {
-      socket.to(socket.id).on("Error", {
-        message: "User Not Found",
-      });
+    if (!receiver || receiver.role === sender.role) {
       socket.disconnect();
     }
 
     //cari room dengan nama gabungan
     let roomName;
-    if (sender.role === "admin") {
+    if (
+      sender.role === "admin" &&
+      receiver.role === "user"
+    ) {
       roomName = `${r_username}${sender.username}`;
     } else {
-      console.log("test1");
       roomName = `${sender.username}${r_username}`;
     }
 
